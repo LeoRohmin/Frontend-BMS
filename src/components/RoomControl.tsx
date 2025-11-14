@@ -5,6 +5,19 @@ import { Switch } from './ui/switch';
 import { Button } from './ui/button';
 import { Lightbulb, Wind, Zap, Thermometer, BarChart3 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { websocketService, TOPICS } from "../services/websocketService";
+
+// Device mapping: Room ID → PM device name
+const deviceMap: Record<number, string> = {
+  1: "PM1",
+  2: "PM2",
+  3: "PM3",
+  4: "PM4",
+  5: "PM5",
+  6: "PM6",
+  7: "PM7",
+  8: "PM8",
+};
 
 const rooms = [
   { id: 1, name: 'Lobby', lights: true, ac: true, power: 24.5, voltage: 220, ampere: 15.2, temp: 24, kwh: 24.5 },
@@ -20,16 +33,44 @@ const rooms = [
 export default function RoomControl() {
   const [roomsState, setRoomsState] = useState(rooms);
 
+  // === 🔌 SEND TO BACKEND ===
+  const sendToBackend = (roomId: number, target: "lamp" | "ac", value: "on" | "off") => {
+    const device = deviceMap[roomId];
+
+    websocketService.send({
+      type: "command",
+      topic: TOPICS.CONTROL,
+      payload: {
+        device,
+        target,   // lamp / ac
+        value,    // on / off
+      },
+      timestamp: Date.now(),
+    });
+
+    console.log("Sent to backend:", { device, target, value });
+  };
+
   const toggleLight = (id: number) => {
     setRoomsState(roomsState.map(room =>
       room.id === id ? { ...room, lights: !room.lights } : room
     ));
+    const room = roomsState.find(r => r.id === id);
+    if (room) {
+      sendToBackend(id, "lamp", room.lights ? "off" : "on");
+    }
+
   };
 
   const toggleAC = (id: number) => {
     setRoomsState(roomsState.map(room =>
       room.id === id ? { ...room, ac: !room.ac } : room
     ));
+    const room = roomsState.find(r => r.id === id);
+    if (room) {
+      sendToBackend(id, "ac", room.ac ? "off" : "on");
+    }
+
   };
 
   return (
