@@ -157,6 +157,7 @@ export default function Dashboard() {
     // === Subscribe ke chart data ===
     const unsubscribeComparisonData = websocketService.subscribe("pln_vs_solar", (data) => {
       if (data?.pln && data?.solar) {
+        console.log("Received PLN vs Solar data:", data);
         const formattedData = data.pln.map((plnItem: any, i: number) => ({
           name: new Date(plnItem.date).toLocaleDateString("en-US", {
             weekday: "short",
