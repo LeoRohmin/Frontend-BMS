@@ -187,6 +187,11 @@ export default function Dashboard() {
     }
   });
 
+    // Tes Data
+  const unsubscribeTes = websocketService.subscribe(TOPICS.TES, (payload) => {
+      console.log("Received TES data:", payload);
+  });
+
     return () => {
       unsubscribe();
       unsubscribeAlarms();
@@ -194,6 +199,7 @@ export default function Dashboard() {
       unsubscribeSolarData();
       unsubscribeRealtime();
       unsubscribeOverview();
+      unsubscribeTes();
       websocketService.disconnect();
     };
   }, []);

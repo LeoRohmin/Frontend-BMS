@@ -295,6 +295,9 @@ export const TOPICS = {
   // Billing and cost
   BILLING: 'billing',
   COST: 'cost',
+
+  //Testing
+  TES : 'ping',
   
   // All messages
   ALL: '*',
