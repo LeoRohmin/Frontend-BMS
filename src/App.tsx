@@ -26,6 +26,17 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({ username: '', role: '' });
 
+  // 🔥 restore login on refresh
+  useEffect(() => {
+    const saved = localStorage.getItem("authUser");
+
+    if (saved) {
+      const user = JSON.parse(saved);
+      setIsLoggedIn(true);
+      setCurrentUser(user);
+    }
+  }, []);
+
   const handleLogin = (username: string, role: string) => {
     setIsLoggedIn(true);
     setCurrentUser({ username, role });
@@ -50,16 +61,6 @@ export default function App() {
       </>
     );
   }
-
-  // Check for existing authUser in localStorage on initial render
-  useEffect(() => {
-    const storedUser = localStorage.getItem("authUser");
-    if (storedUser) {
-      const { username, role } = JSON.parse(storedUser);
-      setIsLoggedIn(true);
-      setCurrentUser({ username, role });
-    }
-  }, []);
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
