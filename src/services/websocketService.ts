@@ -71,7 +71,7 @@ export class WebSocketService {
         this.ws = new WebSocket(this.url);
 
         this.ws.onopen = () => {
-          console.log('✅ WebSocket connected to:', this.url);
+          console.log('✅ WebSocket connected');
           this.reconnectAttempts = 0;
           this.isConnecting = false;
           
@@ -298,6 +298,9 @@ export const TOPICS = {
 
   //Testing
   TES : 'ping',
+
+  //Controls
+  CONTROL : 'control',
   
   // All messages
   ALL: '*',
