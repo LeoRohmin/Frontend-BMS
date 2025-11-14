@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarProvider, SidebarTrigger } from './components/ui/sidebar';
 import { LayoutDashboard, DoorOpen, Activity, Calendar, FileText, TrendingDown, Sun, Bell, Settings, User, LogOut } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -18,6 +18,9 @@ import SettingsPage from './components/SettingsPage';
 import { Button } from './components/ui/button';
 import logoImage from 'figma:asset/5ba82f0368645529403008088d93dd08aa4d7d70.png';
 
+
+
+
 export default function App() {
   const [activeView, setActiveView] = useState('dashboard');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -26,13 +29,16 @@ export default function App() {
   const handleLogin = (username: string, role: string) => {
     setIsLoggedIn(true);
     setCurrentUser({ username, role });
+    localStorage.setItem("authUser", JSON.stringify({ username, role }));
   };
+
 
   const handleLogout = () => {
     setIsLoggedIn(false);
     setCurrentUser({ username: '', role: '' });
     setActiveView('dashboard');
     toast.success('Logged out successfully');
+    localStorage.removeItem("authUser");
   };
 
   // Show login page if not logged in
@@ -44,6 +50,16 @@ export default function App() {
       </>
     );
   }
+
+  // Check for existing authUser in localStorage on initial render
+  useEffect(() => {
+    const storedUser = localStorage.getItem("authUser");
+    if (storedUser) {
+      const { username, role } = JSON.parse(storedUser);
+      setIsLoggedIn(true);
+      setCurrentUser({ username, role });
+    }
+  }, []);
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },

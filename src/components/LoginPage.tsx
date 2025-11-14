@@ -33,12 +33,24 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       // Mock authentication - Ganti dengan logika backend
       if (username === 'admin' && password === 'admin123') {
         toast.success('Login successful!');
+        localStorage.setItem("authUser", JSON.stringify({
+            username: username,
+            role: "Admin"
+        }));
         onLogin(username, 'Admin');
       } else if (username === 'operator' && password === 'operator123') {
         toast.success('Login successful!');
+        localStorage.setItem("authUser", JSON.stringify({
+            username: username,
+            role: "Operator"
+        }));
         onLogin(username, 'Operator');
       } else if (username === 'technician' && password === 'tech123') {
         toast.success('Login successful!');
+        localStorage.setItem("authUser", JSON.stringify({
+            username: username,
+            role: "Technician"
+        }));
         onLogin(username, 'Technician');
       } else {
         toast.error('Invalid username or password');
