@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Switch } from './ui/switch';
@@ -33,6 +33,15 @@ const rooms = [
 export default function RoomControl() {
   const [roomsState, setRoomsState] = useState(rooms);
 
+  // === CONNECT WEBSOCKET ===
+  useEffect(() => {
+    websocketService.connect()
+      .then(() => console.log("RoomControl: WS connected"))
+      .catch(err => console.error("WS error:", err));
+
+    return () => websocketService.disconnect();
+  }, []);
+
   // === 🔌 SEND TO BACKEND ===
   const sendToBackend = (roomId: number, target: "lamp" | "ac", value: "on" | "off") => {
     const device = deviceMap[roomId];
@@ -61,6 +70,7 @@ export default function RoomControl() {
     }
 
   };
+  
 
   const toggleAC = (id: number) => {
     setRoomsState(roomsState.map(room =>
@@ -72,6 +82,7 @@ export default function RoomControl() {
     }
 
   };
+  
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
