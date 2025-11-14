@@ -96,7 +96,9 @@ function AnimatedCounter({
 
 export default function Dashboard() {
   const [totalPower, setTotalPower] = useState(142.5);
+  const [pctPower, setPctPower] = useState(12);
   const [todayCost, setTodayCost] = useState(285000);
+  const [pctCost, setPctCost] = useState(8);
   const [solarOutput, setSolarOutput] = useState(68.2);
   const [solarOutputOfTotal, setSolarsolarOutputOfTotal] = useState(2);
   const [powerData, setPowerData] = useState(initialPowerData);
@@ -123,6 +125,8 @@ export default function Dashboard() {
       // Kalau backend kirim format {"type": "power_summary", "payload": {...}}
       setTotalPower(payload.total_today_kwh ?? 0);
       setTodayCost(payload.total_today_cost ?? 0);
+      setPctPower(payload.pct_change_power_vs_yesterday ?? 0);
+      setPctCost(payload.pct_change_cost_vs_yesterday ?? 0);
     });
 
     // subscribe ke topic alarms
@@ -211,7 +215,7 @@ export default function Dashboard() {
       title: "Total Power Usage",
       value: totalPower,
       unit: " kWh",
-      change: "+12% vs yesterday",
+      change: `${pctPower}% vs yesterday`,
       trend: "up",
       icon: Zap,
       color: "bg-primary",
@@ -222,7 +226,7 @@ export default function Dashboard() {
       value: todayCost,
       unit: "",
       prefix: "Rp ",
-      change: "+8% vs yesterday",
+      change: `${pctCost}% vs yesterday`,
       trend: "up",
       icon: DollarSign,
       color: "bg-accent",
