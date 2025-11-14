@@ -142,20 +142,20 @@ export default function Dashboard() {
     });
 
      // === Subscribe ke real-time energy chart ===
-  const unsubscribeRealtime = websocketService.subscribe("energy", (data) => {
-    // Pastikan payload ada dan array
-    if (Array.isArray(data)) {
-      const formatted = data.map((item: any) => ({
-        time: new Date(item.time).toLocaleTimeString("en-GB", {
-          hour: "2-digit",
-          minute: "2-digit",
-        }), // hasil: "15:30"
-        power: item.value,
-      }));
+    const unsubscribeRealtime = websocketService.subscribe("energy", (data) => {
+      // Pastikan payload ada dan array
+      if (Array.isArray(data)) {
+        const formatted = data.map((item: any) => ({
+          time: new Date(item.time).toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }), // hasil: "15:30"
+          power: item.value,
+        }));
 
-      setPowerData(formatted);
-    }
-  });
+        setPowerData(formatted);
+      }
+    });
 
 
     // === Subscribe ke chart data ===
@@ -174,27 +174,27 @@ export default function Dashboard() {
       }
     });
 
-  // === Subscribe ke overview_room ===
-  const unsubscribeOverview = websocketService.subscribe("floor_status", (data) => {
-    if (Array.isArray(data)) {
-      // Mapping backend → frontend format
-      const formatted = data.map((item: any, index: number) => ({
-        id: index + 1,
-        name: `Floor ${index + 1} - ${item.device}`, // contoh nama
-        power: parseFloat((item.power_kwh / 1000).toFixed(2)), // misalnya convert ke kWh kecil
-        ac: item.ac ? "ON" : "OFF",
-        lights: item.lamp ? "ON" : "OFF",
-        status: item.ac && item.lamp ? "normal" : "warning", // contoh logika status
-      }));
+    // === Subscribe ke overview_room ===
+    const unsubscribeOverview = websocketService.subscribe("floor_status", (data) => {
+      if (Array.isArray(data)) {
+        // Mapping backend → frontend format
+        const formatted = data.map((item: any, index: number) => ({
+          id: index + 1,
+          name: `Floor ${index + 1} - ${item.device}`, // contoh nama
+          power: parseFloat((item.power_kwh / 1000).toFixed(2)), // misalnya convert ke kWh kecil
+          ac: item.ac ? "ON" : "OFF",
+          lights: item.lamp ? "ON" : "OFF",
+          status: item.ac && item.lamp ? "normal" : "warning", // contoh logika status
+        }));
 
-      setFloors(formatted);
-    }
-  });
+        setFloors(formatted);
+      }
+    });
 
-    // Tes Data
-  const unsubscribeTes = websocketService.subscribe(TOPICS.TES, (payload) => {
-      console.log("Received TES data:", payload);
-  });
+      // Tes Data
+    const unsubscribeTes = websocketService.subscribe(TOPICS.TES, (payload) => {
+        console.log("Received TES data:", payload);
+    });
 
     return () => {
       unsubscribe();
@@ -257,7 +257,7 @@ export default function Dashboard() {
 
   return (
 
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-4">
       {/* Status Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {statCards.map((card, index) => (
