@@ -144,7 +144,7 @@ export default function App() {
         <main className="flex-1 overflow-auto bg-background">
           {/* Header */}
           <motion.div 
-            className="border-b border-border bg-white px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-20 shadow-sm"
+            className="border-b border-border bg-white px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm"
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
           >
