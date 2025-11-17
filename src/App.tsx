@@ -38,9 +38,8 @@ export default function App() {
       return () => websocketService.disconnect();
     }, []);
 
-    const unsubscribePLC = websocketService.subscribe(TOPICS.SYSTEM_STATUS, (message: any) => {
-      const status = message.status as PLCStatus;
-      setPlcStatus(status);
+    const unsubscribePLC = websocketService.subscribe(TOPICS.SYSTEM_STATUS, (payload) => {
+      const { status } = payload;
 
       if (status === 'online') {
         setPlcStatus('online');
