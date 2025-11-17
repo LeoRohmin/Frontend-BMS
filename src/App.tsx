@@ -154,7 +154,7 @@ export default function App() {
               <img 
                 src={logoImage} 
                 alt="SANINDO Orisa ENOSYS" 
-                className="h-10 w-auto object-contain"
+                className="h-12 w-auto object-contain"
               />
               <div className="flex flex-col">
                 <span className="text-lg font-bold text-foreground">
