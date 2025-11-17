@@ -36,7 +36,7 @@ export default function App() {
     }, []);
 
     const unsubscribePLC = websocketService.subscribe(TOPICS.SYSTEM_STATUS, (payload) => {
-      const { status } = payload;
+      const { status } = payload.system_online;
 
       if (status === 'true') {
         setPlcStatus('online');
