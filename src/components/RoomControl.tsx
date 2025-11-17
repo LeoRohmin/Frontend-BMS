@@ -49,7 +49,6 @@ export default function RoomControl() {
   // === CONNECT WEBSOCKET ===
   useEffect(() => {
     websocketService.connect()
-
     return () => websocketService.disconnect();
   }, []);
 
