@@ -4,8 +4,11 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
+import { Switch } from './ui/switch';
 import { AlertTriangle, Bell, CheckCircle, Filter } from 'lucide-react';
 import { motion } from 'motion/react';
+import { toast } from 'sonner';
 
 const alarms = [
   { id: 1, time: '2025-01-24 14:32', source: 'Server Room - AC Unit 2', level: 'High', status: 'Active', message: 'Temperature exceeds threshold (28°C)' },
@@ -20,6 +23,19 @@ const alarms = [
 export default function AlarmPage() {
   const [filterLevel, setFilterLevel] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  
+  // Notification settings state
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [smsNotifications, setSmsNotifications] = useState(false);
+  const [pushNotifications, setPushNotifications] = useState(true);
+  const [highPriorityOnly, setHighPriorityOnly] = useState(false);
+  const [soundAlerts, setSoundAlerts] = useState(true);
+
+  const saveNotificationSettings = () => {
+    toast.success('Notification settings saved successfully');
+    setIsSettingsOpen(false);
+  };
 
   const filteredAlarms = alarms.filter(alarm => {
     const levelMatch = filterLevel === 'all' || alarm.level === filterLevel;
@@ -54,7 +70,7 @@ export default function AlarmPage() {
         <p className="text-sm text-muted-foreground">
           Monitor and manage system alarms and notifications
         </p>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={() => setIsSettingsOpen(true)}>
           <Bell className="h-4 w-4 mr-2" />
           Notification Settings
         </Button>
@@ -255,6 +271,48 @@ export default function AlarmPage() {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Notification Settings Dialog */}
+      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Notification Settings</DialogTitle>
+            <DialogDescription>
+              Configure how you receive notifications for system alarms.
+            </DialogDescription>
+          </DialogHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">Email Notifications</p>
+              <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">SMS Notifications</p>
+              <Switch checked={smsNotifications} onCheckedChange={setSmsNotifications} />
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">Push Notifications</p>
+              <Switch checked={pushNotifications} onCheckedChange={setPushNotifications} />
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">High Priority Only</p>
+              <Switch checked={highPriorityOnly} onCheckedChange={setHighPriorityOnly} />
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">Sound Alerts</p>
+              <Switch checked={soundAlerts} onCheckedChange={setSoundAlerts} />
+            </div>
+          </CardContent>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" size="sm" onClick={() => setIsSettingsOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" size="sm" onClick={saveNotificationSettings}>
+              Save
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

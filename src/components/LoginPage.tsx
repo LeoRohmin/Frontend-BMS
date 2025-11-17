@@ -78,9 +78,12 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
               <img 
                 src={logoImage} 
                 alt="SANINDO Orisa ENOSYS" 
-                className="h-30 w-auto object-contain"
+                className="h-20 w-auto object-contain"
               />
             </motion.div>
+            <div className="text-center space-y-2">
+              <CardDescription>Building Management System</CardDescription>
+            </div>
           </CardHeader>
           
           <CardContent>

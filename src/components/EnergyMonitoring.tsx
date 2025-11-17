@@ -1,7 +1,32 @@
 import { useState, useEffect } from "react";
-import {Card,CardContent,CardHeader,CardTitle,} from "./ui/card";
-import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue,} from "./ui/select";
-import {LineChart,Line,PieChart,Pie,Cell,BarChart,Bar,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer,Legend,} from "recharts";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import {
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 import { Zap, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
 

@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge';
 import { Zap, AlertTriangle, Sun } from 'lucide-react';
 import { websocketService, TOPICS } from '../services/websocketService';
-import { toast } from 'sonner';
+import { toast } from 'sonner@2.0.3';
 
 // Interface untuk data real-time
 interface EnergyData {

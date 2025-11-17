@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Switch } from './ui/switch';
 import { Button } from './ui/button';
-import { Lightbulb, Wind, Zap, Thermometer, BarChart3 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
+import { Lightbulb, Wind, Zap, Thermometer, BarChart3, TrendingUp, Clock, AlertCircle } from 'lucide-react';
 import { motion } from 'motion/react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { websocketService, TOPICS } from "../services/websocketService";
 
 // Device mapping: Room ID → PM device name
@@ -32,6 +34,17 @@ const rooms = [
 
 export default function RoomControl() {
   const [roomsState, setRoomsState] = useState(rooms);
+  const [selectedRoom, setSelectedRoom] = useState<typeof rooms[0] | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+  // Generate mock historical data for selected room
+  const generateHistoricalData = (roomPower: number) => {
+    return Array.from({ length: 24 }, (_, i) => ({
+      time: `${i.toString().padStart(2, '0')}:00`,
+      power: Math.max(0, roomPower * (0.8 + Math.random() * 0.4)),
+      temp: 20 + Math.random() * 8,
+    }));
+  };
 
   // === CONNECT WEBSOCKET ===
   useEffect(() => {
@@ -82,7 +95,6 @@ export default function RoomControl() {
     }
 
   };
-  
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
@@ -181,6 +193,10 @@ export default function RoomControl() {
                   variant="outline" 
                   size="sm" 
                   className="w-full"
+                  onClick={() => {
+                    setSelectedRoom(room);
+                    setIsDetailsOpen(true);
+                  }}
                 >
                   <BarChart3 className="h-4 w-4 mr-2" />
                   View Details
@@ -190,6 +206,73 @@ export default function RoomControl() {
           </motion.div>
         ))}
       </div>
+
+      {/* Details Dialog */}
+      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Room Details</DialogTitle>
+            <DialogDescription>
+              View detailed power consumption and temperature data for the selected room.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedRoom && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base font-semibold">{selectedRoom.name}</CardTitle>
+                <Badge 
+                  variant="outline" 
+                  className={selectedRoom.lights || selectedRoom.ac ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-700 border-gray-200'}
+                >
+                  {selectedRoom.lights || selectedRoom.ac ? 'Active' : 'Standby'}
+                </Badge>
+              </div>
+              <div className="border-t border-border pt-3 space-y-2">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                  <Zap className="h-3 w-3" />
+                  <span>Power Meter</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <span className="text-xs text-muted-foreground">Voltage</span>
+                    <p className="font-medium">{selectedRoom.voltage}V</p>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted-foreground">Ampere</span>
+                    <p className="font-medium">{selectedRoom.ampere}A</p>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted-foreground">Temp</span>
+                    <p className="font-medium flex items-center gap-1">
+                      <Thermometer className="h-3 w-3 text-primary" />
+                      {selectedRoom.temp}°C
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted-foreground">Usage</span>
+                    <p className="font-medium text-primary">{selectedRoom.kwh} kWh</p>
+                  </div>
+                </div>
+              </div>
+              <div className="border-t border-border pt-3">
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart
+                    data={generateHistoricalData(selectedRoom.power)}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="time" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="power" stroke="#8884d8" activeDot={{ r: 8 }} />
+                    <Line type="monotone" dataKey="temp" stroke="#82ca9d" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import {Card,CardContent,CardHeader,CardTitle,} from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle,} from "./ui/card";
 import { Badge } from "./ui/badge";
-import {Zap,DollarSign,AlertTriangle,Sun,TrendingUp,TrendingDown,Building,Activity,} from "lucide-react";
-import {LineChart,Line,BarChart,Bar,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer,Legend,} from "recharts";
-import {motion,useMotionValue,useSpring,useTransform,animate,} from "motion/react";
-import { toast } from "sonner";
+import { Zap, DollarSign, AlertTriangle, Sun, TrendingUp, TrendingDown, Building, Activity,} from "lucide-react";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,} from "recharts";
+import { motion, useMotionValue, useSpring, useTransform, animate,} from "motion/react";
 import { websocketService, TOPICS } from "../services/websocketService";
-
 
 const initialPowerData = [
   { time: "00:00", power: 85 },
@@ -106,7 +104,6 @@ export default function Dashboard() {
   const [activeAlarms, setActiveAlarms] = useState(5);
   const [highPriorityAlarms, setHighPriorityAlarms] = useState(2);
   const [floors, setFloors] = useState(FloorsStatus);
-
 
   // === WEBSOCKET CONNECTION ===
   useEffect(() => {
@@ -208,8 +205,6 @@ export default function Dashboard() {
     };
   }, []);
 
-  
-
   const statCards = [
     {
       title: "Total Power Usage",
@@ -256,10 +251,9 @@ export default function Dashboard() {
   ];
 
   return (
-
-    <div className="p-4 sm:p-6 lg:p-8 space-y-4">
+    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
       {/* Status Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {statCards.map((card, index) => (
           <motion.div
             key={card.title}
@@ -320,7 +314,7 @@ export default function Dashboard() {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}

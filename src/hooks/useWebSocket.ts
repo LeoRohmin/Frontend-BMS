@@ -21,7 +21,7 @@ export interface WebSocketStatus {
  * Custom hook untuk WebSocket connection
  * 
  * Usage:
- const { status, sendMessage, lastMessage } = useWebSocket({
+ * const { status, sendMessage, lastMessage } = useWebSocket({
  *   url: 'ws://localhost:8080/ws',
  *   onMessage: (data) => console.log('Received:', data)
  * });
@@ -97,6 +97,34 @@ export function useWebSocket(config: WebSocketConfig) {
         onError?.(error);
       };
 
+      ws.current.onclose = () => {
+        console.log('WebSocket disconnected');
+        setStatus(prev => {
+          const newStatus = {
+            ...prev,
+            isConnected: false,
+            isConnecting: false,
+          };
+
+          // Auto reconnect
+          if (prev.reconnectAttempts < maxReconnectAttempts) {
+            console.log(`Reconnecting... Attempt ${prev.reconnectAttempts + 1}/${maxReconnectAttempts}`);
+            
+            reconnectTimer.current = setTimeout(() => {
+              setStatus(s => ({
+                ...s,
+                reconnectAttempts: s.reconnectAttempts + 1,
+              }));
+              connect();
+            }, reconnectInterval);
+          } else {
+            newStatus.error = 'Max reconnection attempts reached';
+          }
+
+          return newStatus;
+        });
+        onClose?.();
+      };
     } catch (error) {
       console.error('Failed to create WebSocket:', error);
       setStatus(prev => ({

@@ -15,16 +15,79 @@ import CostComparison from './components/CostComparison';
 import GreenEnergy from './components/GreenEnergy';
 import AlarmPage from './components/AlarmPage';
 import SettingsPage from './components/SettingsPage';
+import NotificationsPage from './components/NotificationsPage';
 import { Button } from './components/ui/button';
-import logoImage from 'figma:asset/5ba82f0368645529403008088d93dd08aa4d7d70.png';
+import logoImage from 'figma:asset/5c52e23f7f375ac1e0785bc4a409701a70a18d7f.png';
 
-
-
+type PLCStatus = 'online' | 'offline' | 'connecting';
 
 export default function App() {
   const [activeView, setActiveView] = useState('dashboard');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({ username: '', role: '' });
+  const [plcStatus, setPlcStatus] = useState<PLCStatus>('offline');
+  const [notificationCount, setNotificationCount] = useState(3);
+
+  // Simulate PLC connection status
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    // Simulate connecting
+    setPlcStatus('connecting');
+    toast.info('Connecting to PLC...', { duration: 2000 });
+
+    const connectTimer = setTimeout(() => {
+      // Simulate random connection
+      const isConnected = Math.random() > 0.3; // 70% success rate
+      
+      if (isConnected) {
+        setPlcStatus('online');
+        toast.success('PLC Connected Successfully', {
+          description: 'Real-time monitoring active'
+        });
+      } else {
+        setPlcStatus('offline');
+        toast.error('PLC Connection Failed', {
+          description: 'Retrying in 10 seconds...'
+        });
+      }
+    }, 2000);
+
+    // Simulate connection status changes every 30 seconds
+    const statusInterval = setInterval(() => {
+      setPlcStatus(current => {
+        // 90% chance to stay online, 10% to disconnect
+        if (current === 'online') {
+          if (Math.random() > 0.9) {
+            toast.warning('PLC Connection Lost', {
+              description: 'Attempting to reconnect...'
+            });
+            return 'connecting';
+          }
+          return 'online';
+        } else if (current === 'connecting') {
+          // 80% success rate on reconnection
+          if (Math.random() > 0.2) {
+            toast.success('PLC Reconnected');
+            return 'online';
+          } else {
+            toast.error('Reconnection Failed', {
+              description: 'Retrying...'
+            });
+            return 'offline';
+          }
+        } else {
+          // Auto retry from offline
+          return 'connecting';
+        }
+      });
+    }, 30000); // Check every 30 seconds
+
+    return () => {
+      clearTimeout(connectTimer);
+      clearInterval(statusInterval);
+    };
+  }, [isLoggedIn]);
 
   // 🔥 restore login on refresh
   useEffect(() => {
@@ -72,6 +135,7 @@ export default function App() {
     { id: 'green-energy', label: 'Green Energy', icon: Sun },
     { id: 'alarm', label: 'Alarm', icon: Bell },
     { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
   ];
 
   const renderContent = () => {
@@ -94,6 +158,8 @@ export default function App() {
         return <AlarmPage />;
       case 'settings':
         return <SettingsPage />;
+      case 'notifications':
+        return <NotificationsPage />;
       default:
         return <Dashboard />;
     }
@@ -103,7 +169,7 @@ export default function App() {
     <SidebarProvider>
       <div className="flex h-screen w-full overflow-hidden bg-background">
         <Sidebar className="border-r border-border">
-          <SidebarHeader className="border-b border-sidebar-border px-0 py-0 bg-white">
+          <SidebarHeader className="border-b border-sidebar-border px-6 py-4 bg-white">
             <motion.div 
               className="flex items-center gap-3"
               initial={{ opacity: 0, x: -20 }}
@@ -112,12 +178,20 @@ export default function App() {
               <img 
                 src={logoImage} 
                 alt="SANINDO Orisa ENOSYS" 
-                className="h-13 w-auto object-contain"
+                className="h-10 w-auto object-contain"
               />
+              <div className="flex flex-col">
+                <span className="text-lg font-bold text-foreground">
+                  SANINDO
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  Orisa ENOSYS
+                </span>
+              </div>
             </motion.div>
           </SidebarHeader>
           <SidebarContent className="bg-white">
-            <SidebarMenu className="px-4 py-4">
+            <SidebarMenu className="px-3 py-2">
               {menuItems.map((item, index) => (
                 <motion.div
                   key={item.id}
@@ -129,9 +203,9 @@ export default function App() {
                     <SidebarMenuButton
                       onClick={() => setActiveView(item.id)}
                       isActive={activeView === item.id}
-                      className="transition-all duration-200 hover:bg-sidebar-accent data-[active=true]:bg-primary data-[active=true]:text-white"
+                      className="transition-all duration-200 hover:bg-sidebar-accent data-[active=true]:bg-primary data-[active=true]:text-white h-11 text-base px-4"
                     >
-                      <item.icon className="h-4 w-4" />
+                      <item.icon className="h-5 w-5" />
                       <span>{item.label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -144,7 +218,7 @@ export default function App() {
         <main className="flex-1 overflow-auto bg-background">
           {/* Header */}
           <motion.div 
-            className="border-b border-border bg-white px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm"
+            className="border-b border-border bg-white px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-20 shadow-sm"
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
           >
@@ -161,24 +235,54 @@ export default function App() {
             </div>
             
             <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-              {/* System Online - Hide text on mobile, show only dot */}
+              {/* PLC Status - Dynamic based on connection */}
               <motion.div
-                className="flex items-center gap-2 px-2 sm:px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg"
+                className={`flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg transition-all ${
+                  plcStatus === 'online' 
+                    ? 'bg-green-50 border border-green-200' 
+                    : plcStatus === 'connecting'
+                    ? 'bg-yellow-50 border border-yellow-200'
+                    : 'bg-red-50 border border-red-200'
+                }`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
               >
-                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-sm text-green-700 hidden sm:inline">System Online</span>
+                <div 
+                  className={`h-2 w-2 rounded-full ${
+                    plcStatus === 'online' 
+                      ? 'bg-green-500 animate-pulse' 
+                      : plcStatus === 'connecting'
+                      ? 'bg-yellow-500 animate-ping'
+                      : 'bg-red-500'
+                  }`} 
+                />
+                <span className={`text-sm hidden sm:inline ${
+                  plcStatus === 'online' 
+                    ? 'text-green-700' 
+                    : plcStatus === 'connecting'
+                    ? 'text-yellow-700'
+                    : 'text-red-700'
+                }`}>
+                  PLC {plcStatus === 'online' ? 'Online' : plcStatus === 'connecting' ? 'Connecting...' : 'Offline'}
+                </span>
               </motion.div>
               
-              {/* Notification Bell */}
-              <div className="relative">
-                <Bell className="h-5 w-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
-                <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center bg-red-500 text-white text-xs">
-                  3
-                </Badge>
-              </div>
+              {/* Notification Bell - Clickable */}
+              <button
+                onClick={() => {
+                  setActiveView('notifications');
+                  setNotificationCount(0);
+                }}
+                className="relative hover:bg-muted p-2 rounded-lg transition-colors"
+              >
+                <Bell className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                {notificationCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white text-xs">
+                    {notificationCount}
+                  </Badge>
+                )}
+              </button>
               
               {/* User Profile - Hide details on mobile, show only avatar */}
               <div className="flex items-center gap-2 pl-2 sm:pl-4 border-l border-border">
