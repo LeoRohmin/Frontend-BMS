@@ -297,7 +297,7 @@ export default function App() {
                     ? 'text-yellow-700'
                     : 'text-red-700'
                 }`}>
-                  PLC {plcStatus === 'online' ? 'Online' : plcStatus === 'connecting' ? 'Connecting...' : 'Offline'}
+                  System {plcStatus === 'online' ? 'Online' : plcStatus === 'connecting' ? 'Connecting...' : 'Offline'}
                 </span>
               </motion.div>
               
