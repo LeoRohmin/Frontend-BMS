@@ -38,6 +38,9 @@ export default function App() {
     const unsubscribePLC = websocketService.subscribe(TOPICS.SYSTEM_STATUS, (payload) => {
       const status = payload.system_online;
 
+      setPlcStatus('connecting');
+      toast.info('Connecting to PLC...', { duration: 2000 });
+
       if (status === 'true') {
         setPlcStatus('online');
         toast.success('PLC Connected Successfully', {
@@ -61,68 +64,8 @@ export default function App() {
       };
     }, []);
 
-  // // Simulate PLC connection status
-  // useEffect(() => {
-  //   if (!isLoggedIn) return;
 
-  //   // Simulate connecting
-  //   setPlcStatus('connecting');
-  //   toast.info('Connecting to PLC...', { duration: 2000 });
-
-  //   const connectTimer = setTimeout(() => {
-  //     // Simulate random connection
-  //     const isConnected = Math.random() > 0.3; // 70% success rate
-      
-  //     if (isConnected) {
-  //       setPlcStatus('online');
-  //       toast.success('PLC Connected Successfully', {
-  //         description: 'Real-time monitoring active'
-  //       });
-  //     } else {
-  //       setPlcStatus('offline');
-  //       toast.error('PLC Connection Failed', {
-  //         description: 'Retrying in 10 seconds...'
-  //       });
-  //     }
-  //   }, 2000);
-
-  //   // Simulate connection status changes every 30 seconds
-  //   const statusInterval = setInterval(() => {
-  //     setPlcStatus(current => {
-  //       // 90% chance to stay online, 10% to disconnect
-  //       if (current === 'online') {
-  //         if (Math.random() > 0.9) {
-  //           toast.warning('PLC Connection Lost', {
-  //             description: 'Attempting to reconnect...'
-  //           });
-  //           return 'connecting';
-  //         }
-  //         return 'online';
-  //       } else if (current === 'connecting') {
-  //         // 80% success rate on reconnection
-  //         if (Math.random() > 0.2) {
-  //           toast.success('PLC Reconnected');
-  //           return 'online';
-  //         } else {
-  //           toast.error('Reconnection Failed', {
-  //             description: 'Retrying...'
-  //           });
-  //           return 'offline';
-  //         }
-  //       } else {
-  //         // Auto retry from offline
-  //         return 'connecting';
-  //       }
-  //     });
-  //   }, 30000); // Check every 30 seconds
-
-  //   return () => {
-  //     clearTimeout(connectTimer);
-  //     clearInterval(statusInterval);
-  //   };
-  // }, [isLoggedIn]);
-
-  // 🔥 restore login on refresh
+  // restore login on refresh
   useEffect(() => {
     const saved = localStorage.getItem("authUser");
 
