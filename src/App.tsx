@@ -18,6 +18,7 @@ import SettingsPage from './components/SettingsPage';
 import NotificationsPage from './components/NotificationsPage';
 import { Button } from './components/ui/button';
 import logoImage from 'figma:asset/5c52e23f7f375ac1e0785bc4a409701a70a18d7f.png';
+import { websocketService, TOPICS } from './services/websocketService';
 
 type PLCStatus = 'online' | 'offline' | 'connecting';
 
@@ -28,66 +29,102 @@ export default function App() {
   const [plcStatus, setPlcStatus] = useState<PLCStatus>('offline');
   const [notificationCount, setNotificationCount] = useState(3);
 
-  // Simulate PLC connection status
-  useEffect(() => {
-    if (!isLoggedIn) return;
+  // === CONNECT WEBSOCKET ===
+    useEffect(() => {
+      websocketService.connect()
+        .then(() => console.log("RoomControl: WS connected"))
+        .catch(err => console.error("WS error:", err));
+  
+      return () => websocketService.disconnect();
+    }, []);
 
-    // Simulate connecting
-    setPlcStatus('connecting');
-    toast.info('Connecting to PLC...', { duration: 2000 });
+    const unsubscribePLC = websocketService.subscribe(TOPICS.SYSTEM_STATUS, (message: any) => {
+      const status = message.status as PLCStatus;
+      setPlcStatus(status);
 
-    const connectTimer = setTimeout(() => {
-      // Simulate random connection
-      const isConnected = Math.random() > 0.3; // 70% success rate
-      
-      if (isConnected) {
+      if (status === 'online') {
         setPlcStatus('online');
         toast.success('PLC Connected Successfully', {
           description: 'Real-time monitoring active'
         });
-      } else {
+      } else if (status === 'offline') {
         setPlcStatus('offline');
-        toast.error('PLC Connection Failed', {
+        toast.error('PLC Connection Lost', {
           description: 'Retrying in 10 seconds...'
         });
+      } else if (status === 'connecting') {
+        setPlcStatus('connecting');
+        toast.info('Connecting to PLC...', { duration: 2000 });
       }
-    }, 2000);
+    });
 
-    // Simulate connection status changes every 30 seconds
-    const statusInterval = setInterval(() => {
-      setPlcStatus(current => {
-        // 90% chance to stay online, 10% to disconnect
-        if (current === 'online') {
-          if (Math.random() > 0.9) {
-            toast.warning('PLC Connection Lost', {
-              description: 'Attempting to reconnect...'
-            });
-            return 'connecting';
-          }
-          return 'online';
-        } else if (current === 'connecting') {
-          // 80% success rate on reconnection
-          if (Math.random() > 0.2) {
-            toast.success('PLC Reconnected');
-            return 'online';
-          } else {
-            toast.error('Reconnection Failed', {
-              description: 'Retrying...'
-            });
-            return 'offline';
-          }
-        } else {
-          // Auto retry from offline
-          return 'connecting';
-        }
-      });
-    }, 30000); // Check every 30 seconds
+    // Cleanup subscription on unmount
+    useEffect(() => {
+      return () => {
+        unsubscribePLC();
+      };
+    }, []);
 
-    return () => {
-      clearTimeout(connectTimer);
-      clearInterval(statusInterval);
-    };
-  }, [isLoggedIn]);
+  // // Simulate PLC connection status
+  // useEffect(() => {
+  //   if (!isLoggedIn) return;
+
+  //   // Simulate connecting
+  //   setPlcStatus('connecting');
+  //   toast.info('Connecting to PLC...', { duration: 2000 });
+
+  //   const connectTimer = setTimeout(() => {
+  //     // Simulate random connection
+  //     const isConnected = Math.random() > 0.3; // 70% success rate
+      
+  //     if (isConnected) {
+  //       setPlcStatus('online');
+  //       toast.success('PLC Connected Successfully', {
+  //         description: 'Real-time monitoring active'
+  //       });
+  //     } else {
+  //       setPlcStatus('offline');
+  //       toast.error('PLC Connection Failed', {
+  //         description: 'Retrying in 10 seconds...'
+  //       });
+  //     }
+  //   }, 2000);
+
+  //   // Simulate connection status changes every 30 seconds
+  //   const statusInterval = setInterval(() => {
+  //     setPlcStatus(current => {
+  //       // 90% chance to stay online, 10% to disconnect
+  //       if (current === 'online') {
+  //         if (Math.random() > 0.9) {
+  //           toast.warning('PLC Connection Lost', {
+  //             description: 'Attempting to reconnect...'
+  //           });
+  //           return 'connecting';
+  //         }
+  //         return 'online';
+  //       } else if (current === 'connecting') {
+  //         // 80% success rate on reconnection
+  //         if (Math.random() > 0.2) {
+  //           toast.success('PLC Reconnected');
+  //           return 'online';
+  //         } else {
+  //           toast.error('Reconnection Failed', {
+  //             description: 'Retrying...'
+  //           });
+  //           return 'offline';
+  //         }
+  //       } else {
+  //         // Auto retry from offline
+  //         return 'connecting';
+  //       }
+  //     });
+  //   }, 30000); // Check every 30 seconds
+
+  //   return () => {
+  //     clearTimeout(connectTimer);
+  //     clearInterval(statusInterval);
+  //   };
+  // }, [isLoggedIn]);
 
   // 🔥 restore login on refresh
   useEffect(() => {
