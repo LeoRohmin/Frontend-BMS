@@ -4,7 +4,7 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Bell, AlertTriangle, Info, CheckCircle, X, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 interface Notification {
   id: string;
@@ -248,7 +248,7 @@ export default function NotificationsPage() {
                             variant="ghost"
                             size="sm"
                             className="h-6 w-6 p-0 flex-shrink-0"
-                            onClick={(e) => {
+                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                               e.stopPropagation();
                               deleteNotification(notification.id);
                             }}

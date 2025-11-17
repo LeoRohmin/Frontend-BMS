@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -5,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { FileText, Download, TrendingUp, TrendingDown } from 'lucide-react';
 import { motion } from 'motion/react';
 import { exportToPDF, exportToExcel } from '../utils/exportUtils';
+import { websocketService, TOPICS } from '../services/websocketService';
 
 const billingData = [
   { date: '2025-01-24', energyUsed: 214.7, cost: 429400, source: 'PLN: 146.5 / Solar: 68.2' },
@@ -20,6 +22,12 @@ export default function BillingReport() {
   const totalThisMonth = billingData.reduce((sum, item) => sum + item.cost, 0);
   const avgDaily = totalThisMonth / billingData.length;
   const totalEnergy = billingData.reduce((sum, item) => sum + item.energyUsed, 0);
+
+  // === CONNECT WEBSOCKET ===
+    useEffect(() => {
+      websocketService.connect()
+      return () => websocketService.disconnect();
+    }, []);
 
   const handleExportPDF = () => {
     exportToPDF(

@@ -145,7 +145,7 @@ export default function App() {
     <SidebarProvider>
       <div className="flex h-screen w-full overflow-hidden bg-background">
         <Sidebar className="border-r border-border">
-          <SidebarHeader className="border-b border-sidebar-border px-6 py-4 bg-white">
+          <SidebarHeader className="border-b border-sidebar-border px-6 py-2 bg-white">
             <motion.div 
               className="flex items-center gap-3"
               initial={{ opacity: 0, x: -20 }}

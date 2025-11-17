@@ -1,34 +1,10 @@
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
-import {
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
+import { Card, CardContent, CardHeader, CardTitle,} from "./ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "./ui/select";
+import { LineChart, Line, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,} from "recharts";
 import { Zap, TrendingUp } from "lucide-react";
 import { motion } from "motion/react";
+import { websocketService, TOPICS } from "../services/websocketService";
 
 const initialHourlyData = [
   { time: "00:00", power: 45 },
@@ -64,12 +40,15 @@ const initialDailyData = [
 ];
 
 export default function EnergyMonitoring() {
-  const [selectedLocation, setSelectedLocation] =
-    useState("all");
-  const [hourlyData, setHourlyData] = useState(
-    initialHourlyData,
-  );
+  const [selectedLocation, setSelectedLocation] = useState("all");
+  const [hourlyData, setHourlyData] = useState(initialHourlyData);
   const [dailyData, setDailyData] = useState(initialDailyData);
+
+  // === CONNECT WEBSOCKET ===
+    useEffect(() => {
+      websocketService.connect()
+      return () => websocketService.disconnect();
+    }, []);
 
   // Real-time data update simulation every 4 seconds
   useEffect(() => {

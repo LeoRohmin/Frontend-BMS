@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -9,6 +9,7 @@ import { Switch } from './ui/switch';
 import { AlertTriangle, Bell, CheckCircle, Filter } from 'lucide-react';
 import { motion } from 'motion/react';
 import { toast } from 'sonner';
+import { websocketService, TOPICS } from '../services/websocketService';
 
 const alarms = [
   { id: 1, time: '2025-01-24 14:32', source: 'Server Room - AC Unit 2', level: 'High', status: 'Active', message: 'Temperature exceeds threshold (28°C)' },
@@ -31,6 +32,12 @@ export default function AlarmPage() {
   const [pushNotifications, setPushNotifications] = useState(true);
   const [highPriorityOnly, setHighPriorityOnly] = useState(false);
   const [soundAlerts, setSoundAlerts] = useState(true);
+
+  // === CONNECT WEBSOCKET ===
+    useEffect(() => {
+      websocketService.connect()
+      return () => websocketService.disconnect();
+    }, []);
 
   const saveNotificationSettings = () => {
     toast.success('Notification settings saved successfully');

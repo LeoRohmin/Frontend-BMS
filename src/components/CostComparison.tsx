@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { TrendingDown, DollarSign, Percent } from 'lucide-react';
 import { motion } from 'motion/react';
+import { websocketService, TOPICS } from '../services/websocketService';
 
 const initialWeeklyComparison = [
   { day: 'Mon', pln: 293000, solar: 0 },
@@ -30,6 +31,12 @@ export default function CostComparison() {
   const [period, setPeriod] = useState('monthly');
   const [weeklyComparison, setWeeklyComparison] = useState(initialWeeklyComparison);
   const [monthlyComparison, setMonthlyComparison] = useState(initialMonthlyComparison);
+
+  // === CONNECT WEBSOCKET ===
+    useEffect(() => {
+      websocketService.connect()
+      return () => websocketService.disconnect();
+    }, []);
 
   // Real-time data update simulation every 5 seconds
   useEffect(() => {

@@ -5,6 +5,7 @@ import { Progress } from './ui/progress';
 import { Sun, Battery, Zap, TrendingUp, Cloud } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { motion } from 'motion/react';
+import { websocketService, TOPICS } from '../services/websocketService';
 
 const initialSolarProductionData = [
   { time: '06:00', production: 5.2 },
@@ -29,6 +30,12 @@ export default function GreenEnergy() {
   const [efficiency, setEfficiency] = useState(94.5);
   const [solarProductionData, setSolarProductionData] = useState(initialSolarProductionData);
   const [comparisonData, setComparisonData] = useState(initialComparisonData);
+
+  // === CONNECT WEBSOCKET ===
+    useEffect(() => {
+      websocketService.connect()
+      return () => websocketService.disconnect();
+    }, []);
 
   // Update animated stats every 3 seconds
   useEffect(() => {

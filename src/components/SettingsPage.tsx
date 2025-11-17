@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -7,6 +7,7 @@ import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { Settings, Plus, Trash2, Edit, Activity } from 'lucide-react';
 import { motion } from 'motion/react';
+import { websocketService, TOPICS } from '../services/websocketService';
 
 const powerMeters = [
   { id: 1, name: 'Main Lobby Meter', location: 'Floor 1 - Lobby', ip: '192.168.1.101', modbusAddr: '01', status: 'Online' },
@@ -24,6 +25,11 @@ export default function SettingsPage() {
     ip: '',
     modbusAddr: '',
   });
+
+  useEffect(() => {
+    websocketService.connect()
+    return () => websocketService.disconnect();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

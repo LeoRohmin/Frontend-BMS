@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -9,6 +9,7 @@ import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Calendar, Plus, Trash2, Edit, Clock } from 'lucide-react';
 import { motion } from 'motion/react';
+import { websocketService, TOPICS } from '../services/websocketService';
 
 const schedules = [
   { id: 1, startTime: '06:00', endTime: '22:00', action: 'ON', target: 'Lights - All Floors', active: true, days: 'Mon-Fri' },
@@ -34,6 +35,12 @@ export default function Scheduling() {
     target: '',
     days: ''
   });
+
+  // === CONNECT WEBSOCKET ===
+    useEffect(() => {
+      websocketService.connect()
+      return () => websocketService.disconnect();
+    }, []);
 
   // Handler untuk submit form
   const handleSubmit = (e: React.FormEvent) => {
