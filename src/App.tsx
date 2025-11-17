@@ -32,29 +32,26 @@ export default function App() {
   // === CONNECT WEBSOCKET ===
     useEffect(() => {
       websocketService.connect()
-        .then(() => console.log("RoomControl: WS connected"))
-        .catch(err => console.error("WS error:", err));
-  
       return () => websocketService.disconnect();
     }, []);
 
     const unsubscribePLC = websocketService.subscribe(TOPICS.SYSTEM_STATUS, (payload) => {
       const { status } = payload;
 
-      if (status === 'online') {
+      if (status === 'true') {
         setPlcStatus('online');
         toast.success('PLC Connected Successfully', {
           description: 'Real-time monitoring active'
         });
-      } else if (status === 'offline') {
+      } else if (status === 'false') {
         setPlcStatus('offline');
         toast.error('PLC Connection Lost', {
           description: 'Retrying in 10 seconds...'
         });
-      } else if (status === 'connecting') {
+      } else {
         setPlcStatus('connecting');
         toast.info('Connecting to PLC...', { duration: 2000 });
-      }
+      } 
     });
 
     // Cleanup subscription on unmount
