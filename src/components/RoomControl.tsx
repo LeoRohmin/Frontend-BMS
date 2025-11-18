@@ -22,14 +22,14 @@ const deviceMap: Record<number, string> = {
 };
 
 const rooms = [
-  { id: 1, name: 'Lobby', lights: true, ac: true, power: 24.5, voltage: 220, ampere: 15.2, temp: 24, kwh: 24.5 },
-  { id: 2, name: 'Office Area', lights: true, ac: true, power: 45.2, voltage: 220, ampere: 28.5, temp: 22, kwh: 45.2 },
-  { id: 3, name: 'Meeting Room A', lights: false, ac: false, power: 0, voltage: 220, ampere: 0, temp: 26, kwh: 18.3 },
-  { id: 4, name: 'Meeting Room B', lights: true, ac: true, power: 18.3, voltage: 220, ampere: 12.1, temp: 23, kwh: 18.3 },
-  { id: 5, name: 'Server Room', lights: true, ac: true, power: 62.8, voltage: 220, ampere: 42.5, temp: 19, kwh: 62.8 },
-  { id: 6, name: 'Cafeteria', lights: true, ac: true, power: 28.6, voltage: 220, ampere: 18.9, temp: 25, kwh: 28.6 },
-  { id: 7, name: 'Storage', lights: false, ac: false, power: 0, voltage: 220, ampere: 0, temp: 28, kwh: 5.2 },
-  { id: 8, name: 'Parking', lights: true, ac: false, power: 8.4, voltage: 220, ampere: 5.6, temp: 30, kwh: 8.4 },
+  { id: 1, name: 'Lobby', lights: true, ac: true, power: 24.5, voltage: 220, ampere: 15.2, temp: 24, kwh: 24.5, history: {power: [], temp: []} },
+  { id: 2, name: 'Office Area', lights: true, ac: true, power: 45.2, voltage: 220, ampere: 28.5, temp: 22, kwh: 45.2, history: {power: [], temp: []} },
+  { id: 3, name: 'Meeting Room A', lights: false, ac: false, power: 0, voltage: 220, ampere: 0, temp: 26, kwh: 18.3, history: {power: [], temp: []} },
+  { id: 4, name: 'Meeting Room B', lights: true, ac: true, power: 18.3, voltage: 220, ampere: 12.1, temp: 23, kwh: 18.3, history: {power: [], temp: []} },
+  { id: 5, name: 'Server Room', lights: true, ac: true, power: 62.8, voltage: 220, ampere: 42.5, temp: 19, kwh: 62.8, history: {power: [], temp: []} },
+  { id: 6, name: 'Cafeteria', lights: true, ac: true, power: 28.6, voltage: 220, ampere: 18.9, temp: 25, kwh: 28.6, history: {power: [], temp: []} },
+  { id: 7, name: 'Storage', lights: false, ac: false, power: 0, voltage: 220, ampere: 0, temp: 28, kwh: 5.2, history: {power: [], temp: []} },
+  { id: 8, name: 'Parking', lights: true, ac: false, power: 8.4, voltage: 220, ampere: 5.6, temp: 30, kwh: 8.4, history: {power: [], temp: []} },
 ];
 
 export default function RoomControl() {
@@ -37,14 +37,14 @@ export default function RoomControl() {
   const [selectedRoom, setSelectedRoom] = useState<typeof rooms[0] | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  // Generate mock historical data for selected room
-  const generateHistoricalData = (roomPower: number) => {
-    return Array.from({ length: 24 }, (_, i) => ({
-      time: `${i.toString().padStart(2, '0')}:00`,
-      power: Math.max(0, roomPower * (0.8 + Math.random() * 0.4)),
-      temp: 20 + Math.random() * 8,
-    }));
-  };
+  // // Generate mock historical data for selected room
+  // const generateHistoricalData = (roomPower: number) => {
+  //   return Array.from({ length: 24 }, (_, i) => ({
+  //     time: `${i.toString().padStart(2, '0')}:00`,
+  //     power: Math.max(0, roomPower * (0.8 + Math.random() * 0.4)),
+  //     temp: 20 + Math.random() * 8,
+  //   }));
+  // };
 
   // === CONNECT WEBSOCKET ===
   useEffect(() => {
@@ -78,7 +78,6 @@ export default function RoomControl() {
     if (room) {
       sendToBackend(id, "lamp", room.lights ? "off" : "on");
     }
-
   };
   
 
@@ -90,8 +89,42 @@ export default function RoomControl() {
     if (room) {
       sendToBackend(id, "ac", room.ac ? "off" : "on");
     }
-
   };
+
+  // === Subscribe to real-time updates from backend ===
+  useEffect(() => {
+    const unsubscribe = websocketService.subscribe(TOPICS.ROOM_STATUS, (roomsPayload) => {
+
+      if (!Array.isArray(roomsPayload)) return;
+
+      setRoomsState(prevRooms =>
+        prevRooms.map(room => {
+          const matched = roomsPayload.find(
+            r => r.device === deviceMap[room.id]
+          );
+
+          return matched
+            ? {
+                ...room,
+                power: matched.power,
+                voltage: matched.voltage,
+                ampere: matched.ampere,
+                temp: matched.temp,
+                kwh: matched.kwh,
+
+                history: {
+                power: matched.history?.power || room.history.power,
+                temp: matched.history?.temp || room.history.temp
+              }
+                
+              }
+            : room;
+        })
+      );
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
@@ -254,7 +287,11 @@ export default function RoomControl() {
               <div className="border-t border-border pt-3">
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart
-                    data={generateHistoricalData(selectedRoom.power)}
+                    data={selectedRoom.history.power.length > 0 ? selectedRoom.history.power : Array.from({ length: 24 }, (_, i) => ({
+                      time: `${i.toString().padStart(2, '0')}:00`,
+                      power: 0,
+                      temp: 0,
+                    }))}
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
