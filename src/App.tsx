@@ -32,6 +32,12 @@ export default function App() {
   // === CONNECT WEBSOCKET ===
     useEffect(() => {
       websocketService.connect()
+        .then(() => {
+          console.log('WebSocket connected successfully');
+        })
+        .catch((error) => {
+          console.error('WebSocket connection error:', error);
+        });
       return () => websocketService.disconnect();
     }, []);
 
