@@ -42,13 +42,11 @@ export default function App() {
     }, []);
 
 
-    const unsubscribePLC = websocketService.subscribe(
-      TOPICS.SYSTEM_STATUS,
-      (payload) => {
+    const unsubscribePLC = websocketService.subscribe(TOPICS.SYSTEM_STATUS,(payload) => {
         const status = payload.system_online;
 
         // Kalau backend kirim "true"
-        if (status === "true") {
+        if (status === true) {
           setPlcStatus("online");
           toast.success("PLC Connected Successfully", {
             description: "Real-time monitoring active",
@@ -56,7 +54,7 @@ export default function App() {
         }
 
         // Kalau backend kirim "false"
-        else if (status === "false") {
+        else if (status === false) {
           setPlcStatus("offline");
           toast.error("PLC Connection Lost", {
             description: "Retrying in 10 seconds...",
