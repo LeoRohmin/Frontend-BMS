@@ -26,7 +26,7 @@ export default function App() {
   const [activeView, setActiveView] = useState('dashboard');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({ username: '', role: '' });
-  const [plcStatus, setPlcStatus] = useState<PLCStatus>('offline');
+  const [plcStatus, setPlcStatus] = useState<PLCStatus>('connecting');
   const [notificationCount, setNotificationCount] = useState(3);
 
   // === CONNECT WEBSOCKET ===
@@ -35,29 +35,31 @@ export default function App() {
       return () => websocketService.disconnect();
     }, []);
 
-    const unsubscribePLC = websocketService.subscribe(TOPICS.SYSTEM_STATUS, (payload) => {
-      const status = payload.system_online;
 
-      setPlcStatus('connecting');
-      toast.info('Connecting to PLC...', { duration: 2000 });
+    const unsubscribePLC = websocketService.subscribe(
+      TOPICS.SYSTEM_STATUS,
+      (payload) => {
+        const status = payload.system_online;
 
-      if (status === 'true') {
-        setPlcStatus('online');
-        toast.success('PLC Connected Successfully', {
-          description: 'Real-time monitoring active'
-        });
-      } else if (status === 'false') {
-        setPlcStatus('offline');
-        toast.error('PLC Connection Lost', {
-          description: 'Retrying in 10 seconds...'
-        });
-      } else {
-        setPlcStatus('connecting');
-        toast.info('Connecting to PLC...', { duration: 2000 });
-      } 
-    });
+        // Kalau backend kirim "true"
+        if (status === "true") {
+          setPlcStatus("online");
+          toast.success("PLC Connected Successfully", {
+            description: "Real-time monitoring active",
+          });
+        }
 
-    // Cleanup subscription on unmount
+        // Kalau backend kirim "false"
+        else if (status === "false") {
+          setPlcStatus("offline");
+          toast.error("PLC Connection Lost", {
+            description: "Retrying in 10 seconds...",
+          });
+        }
+      }
+    );
+
+    // Cleanup
     useEffect(() => {
       return () => {
         unsubscribePLC();
