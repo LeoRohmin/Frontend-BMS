@@ -48,17 +48,10 @@ export default function App() {
         // Kalau backend kirim "true"
         if (status === true) {
           setPlcStatus("online");
-          toast.success("PLC Connected Successfully", {
-            description: "Real-time monitoring active",
-          });
         }
-
         // Kalau backend kirim "false"
         else if (status === false) {
           setPlcStatus("offline");
-          toast.error("PLC Connection Lost", {
-            description: "Retrying in 10 seconds...",
-          });
         }
       }
     );
