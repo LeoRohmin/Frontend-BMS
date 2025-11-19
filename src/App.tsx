@@ -36,8 +36,7 @@ export default function App() {
 
     // Subscribe to PLC System Status
     useEffect(() => {
-    const subscribePLC =  websocketService.onReady(() => {
-      websocketService.subscribe(TOPICS.SYSTEM_STATUS,(payload) => {
+    const subscribePLC =  websocketService.subscribe(TOPICS.SYSTEM_STATUS,(payload) => {
         const status = payload.system_online;
 
         // Kalau backend kirim "true"
@@ -48,9 +47,8 @@ export default function App() {
         else if (status === false) {
           setPlcStatus("offline");
         }
-      });
-    });
-
+      }
+    );
     return () => {
       subscribePLC();
     };
