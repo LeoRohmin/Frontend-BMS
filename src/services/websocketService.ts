@@ -32,6 +32,7 @@ export class WebSocketService {
     reconnectInterval?: number;
     maxReconnectAttempts?: number;
   };
+  private onOpenCallbacks = new Set<() => void>();
 
   constructor(
     url: string = WEBSOCKET_URL,
@@ -74,7 +75,8 @@ export class WebSocketService {
           console.log('✅ WebSocket connected');
           this.reconnectAttempts = 0;
           this.isConnecting = false;
-          
+          // Call all waiting callbacks
+          this.onOpenCallbacks.forEach((callback) => callback());
           // Send authentication message if needed
           // this.send({ type: 'auth', token: 'YOUR_TOKEN' });
           
@@ -110,6 +112,23 @@ export class WebSocketService {
         reject(error);
       }
     });
+  }
+
+    /**
+   * Allow components to subscribe only when WS is ready
+   */
+  onReady(callback: () => void) {
+    this.onOpenCallbacks.add(callback);
+
+    // If WebSocket already open → call immediately
+    if (this.isConnected()) {
+      callback();
+    }
+
+    // Return unsubscribe function
+    return () => {
+      this.onOpenCallbacks.delete(callback);
+    };
   }
 
   /**
