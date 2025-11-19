@@ -110,17 +110,19 @@ export default function Dashboard() {
     // Subscribe ke data power_summary (sesuai format dari backend)
     const unsubscribe = websocketService.onReady(() => {
       websocketService.subscribe(TOPICS.POWER, (payload) => {
-          // Kalau backend kirim format {"type": "power_summary", "payload": {...}}
-          setTotalPower(payload.total_today_kwh ?? 0);
-          setTodayCost(payload.total_today_cost ?? 0);
-          setPctPower(payload.pct_change_power_vs_yesterday ?? 0);
-          setPctCost(payload.pct_change_cost_vs_yesterday ?? 0);
+        if (!payload) return;
+        // Kalau backend kirim format {"type": "power_summary", "payload": {...}}
+        setTotalPower(payload.total_today_kwh ?? 0);
+        setTodayCost(payload.total_today_cost ?? 0);
+        setPctPower(payload.pct_change_power_vs_yesterday ?? 0);
+        setPctCost(payload.pct_change_cost_vs_yesterday ?? 0);
       });
     });
 
     // subscribe ke topic alarms
     const unsubscribeAlarms = websocketService.onReady(() => {
       websocketService.subscribe(TOPICS.ALARMS, (payload) => {
+        if (!payload) return;
         setActiveAlarms(payload.active_alarms ?? 0);
         setHighPriorityAlarms(payload.high_priority_alarms ?? 0);
       });
@@ -129,6 +131,7 @@ export default function Dashboard() {
     // subscribe ke topic solar data
     const unsubscribeSolarData = websocketService.onReady(() => {
       websocketService.subscribe(TOPICS.SOLAR, (payload) => {
+        if (!payload) return;
         setSolarOutput(payload.solar_today_kwh ?? 0);
         setSolarsolarOutputOfTotal(payload.solar_share_pct ?? 0);
       });
@@ -204,7 +207,6 @@ export default function Dashboard() {
       unsubscribeRealtime();
       unsubscribeOverview();
       unsubscribeTes();
-      websocketService.disconnect();
     };
 
   }, []);
