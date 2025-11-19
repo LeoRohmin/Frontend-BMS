@@ -23,11 +23,6 @@ export default function BillingReport() {
   const avgDaily = totalThisMonth / billingData.length;
   const totalEnergy = billingData.reduce((sum, item) => sum + item.energyUsed, 0);
 
-  // === CONNECT WEBSOCKET ===
-    useEffect(() => {
-      websocketService.connect()
-      return () => websocketService.disconnect();
-    }, []);
 
   const handleExportPDF = () => {
     exportToPDF(

@@ -33,11 +33,6 @@ export default function AlarmPage() {
   const [highPriorityOnly, setHighPriorityOnly] = useState(false);
   const [soundAlerts, setSoundAlerts] = useState(true);
 
-  // === CONNECT WEBSOCKET ===
-    useEffect(() => {
-      websocketService.connect()
-      return () => websocketService.disconnect();
-    }, []);
 
   const saveNotificationSettings = () => {
     toast.success('Notification settings saved successfully');

@@ -38,7 +38,6 @@ export default function App() {
     useEffect(() => {
     const subscribePLC =  websocketService.subscribe(TOPICS.SYSTEM_STATUS,(payload) => {
         const status = payload.system_online;
-
         // Kalau backend kirim "true"
         if (status === true) {
           setPlcStatus("online");

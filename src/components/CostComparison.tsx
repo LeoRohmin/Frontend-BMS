@@ -32,11 +32,6 @@ export default function CostComparison() {
   const [weeklyComparison, setWeeklyComparison] = useState(initialWeeklyComparison);
   const [monthlyComparison, setMonthlyComparison] = useState(initialMonthlyComparison);
 
-  // === CONNECT WEBSOCKET ===
-    useEffect(() => {
-      websocketService.connect()
-      return () => websocketService.disconnect();
-    }, []);
 
   // Real-time data update simulation every 5 seconds
   useEffect(() => {
