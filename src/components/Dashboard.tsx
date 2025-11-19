@@ -108,79 +108,92 @@ export default function Dashboard() {
   useEffect(() => {
 
     // Subscribe ke data power_summary (sesuai format dari backend)
-    const unsubscribe = websocketService.subscribe(TOPICS.POWER, (payload) => {
-      // Kalau backend kirim format {"type": "power_summary", "payload": {...}}
-      setTotalPower(payload.total_today_kwh ?? 0);
-      setTodayCost(payload.total_today_cost ?? 0);
-      setPctPower(payload.pct_change_power_vs_yesterday ?? 0);
-      setPctCost(payload.pct_change_cost_vs_yesterday ?? 0);
+    const unsubscribe = websocketService.onReady(() => {
+      websocketService.subscribe(TOPICS.POWER, (payload) => {
+          // Kalau backend kirim format {"type": "power_summary", "payload": {...}}
+          setTotalPower(payload.total_today_kwh ?? 0);
+          setTodayCost(payload.total_today_cost ?? 0);
+          setPctPower(payload.pct_change_power_vs_yesterday ?? 0);
+          setPctCost(payload.pct_change_cost_vs_yesterday ?? 0);
+      });
     });
 
     // subscribe ke topic alarms
-    const unsubscribeAlarms = websocketService.subscribe(TOPICS.ALARMS, (payload) => {
-      setActiveAlarms(payload.active_alarms ?? 0);
-      setHighPriorityAlarms(payload.high_priority_alarms ?? 0);
+    const unsubscribeAlarms = websocketService.onReady(() => {
+      websocketService.subscribe(TOPICS.ALARMS, (payload) => {
+        setActiveAlarms(payload.active_alarms ?? 0);
+        setHighPriorityAlarms(payload.high_priority_alarms ?? 0);
+      });
     });
 
     // subscribe ke topic solar data
-    const unsubscribeSolarData = websocketService.subscribe(TOPICS.SOLAR, (payload) => {
-      setSolarOutput(payload.solar_today_kwh ?? 0);
-      setSolarsolarOutputOfTotal(payload.solar_share_pct ?? 0);
+    const unsubscribeSolarData = websocketService.onReady(() => {
+      websocketService.subscribe(TOPICS.SOLAR, (payload) => {
+        setSolarOutput(payload.solar_today_kwh ?? 0);
+        setSolarsolarOutputOfTotal(payload.solar_share_pct ?? 0);
+      });
     });
 
      // === Subscribe ke real-time energy chart ===
-    const unsubscribeRealtime = websocketService.subscribe("energy", (data) => {
-      // Pastikan payload ada dan array
-      if (Array.isArray(data)) {
-        const formatted = data.map((item: any) => ({
-          time: new Date(item.time).toLocaleTimeString("en-GB", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }), // hasil: "15:30"
-          power: item.value,
-        }));
+    const unsubscribeRealtime = websocketService.onReady(() => {
+      websocketService.subscribe("energy", (data) => {  
+        // Pastikan payload ada dan array
+        if (Array.isArray(data)) {
+          const formatted = data.map((item: any) => ({
+            time: new Date(item.time).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }), // hasil: "15:30"
+            power: item.value,
+          }));
 
-        setPowerData(formatted);
-      }
+          setPowerData(formatted);
+        }
+      });
     });
 
-
     // === Subscribe ke chart data ===
-    const unsubscribeComparisonData = websocketService.subscribe("pln_vs_solar", (data) => {
-      if (data?.pln && data?.solar) {
-        console.log("Received PLN vs Solar data:", data);
-        const formattedData = data.pln.map((plnItem: any, i: number) => ({
-          name: new Date(plnItem.date).toLocaleDateString("en-US", {
-            weekday: "short",
-          }), // contoh: "Thu"
-          pln: plnItem.value,
-          solar: data.solar[i]?.value ?? 0,
-        }));
+    const unsubscribeComparisonData = websocketService.onReady(() => {
+      websocketService.subscribe("pln_vs_solar", (data) => {
+        if (data?.pln && data?.solar) {
+          console.log("Received PLN vs Solar data:", data);
+          const formattedData = data.pln.map((plnItem: any, i: number) => ({
+            name: new Date(plnItem.date).toLocaleDateString("en-US", {
+              weekday: "short",
+            }), // contoh: "Thu"
+            pln: plnItem.value,
+            solar: data.solar[i]?.value ?? 0,
+          }));
 
-        setComparisonData(formattedData);
-      }
+          setComparisonData(formattedData);
+        }
+      });
     });
 
     // === Subscribe ke overview_room ===
-    const unsubscribeOverview = websocketService.subscribe("floor_status", (data) => {
-      if (Array.isArray(data)) {
-        // Mapping backend → frontend format
-        const formatted = data.map((item: any, index: number) => ({
-          id: index + 1,
-          name: `Floor ${index + 1} - ${item.device}`, // contoh nama
-          power: parseFloat((item.power_kwh / 1000).toFixed(2)), // misalnya convert ke kWh kecil
-          ac: item.ac ? "ON" : "OFF",
-          lights: item.lamp ? "ON" : "OFF",
-          status: item.ac && item.lamp ? "normal" : "warning", // contoh logika status
-        }));
+    const unsubscribeOverview =  websocketService.onReady(() => {
+      websocketService.subscribe("floor_status", (data) => {
+        if (Array.isArray(data)) {
+          // Mapping backend → frontend format
+          const formatted = data.map((item: any, index: number) => ({
+            id: index + 1,
+            name: `Floor ${index + 1} - ${item.device}`, // contoh nama
+            power: parseFloat((item.power_kwh / 1000).toFixed(2)), // misalnya convert ke kWh kecil
+            ac: item.ac ? "ON" : "OFF",
+            lights: item.lamp ? "ON" : "OFF",
+            status: item.ac && item.lamp ? "normal" : "warning", // contoh logika status
+          }));
 
-        setFloors(formatted);
-      }
+          setFloors(formatted);
+        }
+      });
     });
 
       // Tes Data
-    const unsubscribeTes = websocketService.subscribe(TOPICS.TES, (payload) => {
+    const unsubscribeTes = websocketService.onReady(() => {
+      websocketService.subscribe(TOPICS.TES, (payload) => {
         console.log("Received TES data:", payload);
+      });
     });
 
     return () => {
@@ -193,6 +206,7 @@ export default function Dashboard() {
       unsubscribeTes();
       websocketService.disconnect();
     };
+
   }, []);
 
   const statCards = [
