@@ -32,11 +32,11 @@ export default function App() {
   // === CONNECT WEBSOCKET ===
     useEffect(() => {
       websocketService.connect()
-      return () => websocketService.disconnect();
     }, []);
 
-
-    const unsubscribePLC = websocketService.subscribe(TOPICS.SYSTEM_STATUS,(payload) => {
+    // Subscribe to PLC System Status
+    useEffect(() => {
+    const subscribePLC = websocketService.subscribe(TOPICS.SYSTEM_STATUS,(payload) => {
         const status = payload.system_online;
 
         // Kalau backend kirim "true"
@@ -49,14 +49,10 @@ export default function App() {
         }
       }
     );
-
-    // Cleanup
-    useEffect(() => {
-      return () => {
-        unsubscribePLC();
-      };
-    }, []);
-
+    return () => {
+      subscribePLC();
+    };
+  }, []);
 
   // restore login on refresh
   useEffect(() => {
