@@ -73,6 +73,7 @@ export default function App() {
 
 
   const handleLogout = () => {
+    websocketService.disconnect();
     setIsLoggedIn(false);
     setCurrentUser({ username: '', role: '' });
     setActiveView('dashboard');
