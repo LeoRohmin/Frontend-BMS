@@ -26,10 +26,6 @@ export default function SettingsPage() {
     modbusAddr: '',
   });
 
-  useEffect(() => {
-    websocketService.connect()
-    return () => websocketService.disconnect();
-  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

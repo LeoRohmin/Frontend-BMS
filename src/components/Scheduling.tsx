@@ -36,11 +36,6 @@ export default function Scheduling() {
     days: ''
   });
 
-  // === CONNECT WEBSOCKET ===
-    useEffect(() => {
-      websocketService.connect()
-      return () => websocketService.disconnect();
-    }, []);
 
   // Handler untuk submit form
   const handleSubmit = (e: React.FormEvent) => {

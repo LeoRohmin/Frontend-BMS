@@ -105,17 +105,7 @@ export default function Dashboard() {
   const [highPriorityAlarms, setHighPriorityAlarms] = useState(2);
   const [floors, setFloors] = useState(FloorsStatus);
 
-  // === WEBSOCKET CONNECTION ===
   useEffect(() => {
-    const connectWS = async () => {
-      try {
-        await websocketService.connect();
-      } catch (err) {
-        console.error("WebSocket connection failed:", err);
-      }
-    };
-
-    connectWS();
 
     // Subscribe ke data power_summary (sesuai format dari backend)
     const unsubscribe = websocketService.subscribe(TOPICS.POWER, (payload) => {

@@ -31,11 +31,6 @@ export default function GreenEnergy() {
   const [solarProductionData, setSolarProductionData] = useState(initialSolarProductionData);
   const [comparisonData, setComparisonData] = useState(initialComparisonData);
 
-  // === CONNECT WEBSOCKET ===
-    useEffect(() => {
-      websocketService.connect()
-      return () => websocketService.disconnect();
-    }, []);
 
   // Update animated stats every 3 seconds
   useEffect(() => {

@@ -44,11 +44,6 @@ export default function EnergyMonitoring() {
   const [hourlyData, setHourlyData] = useState(initialHourlyData);
   const [dailyData, setDailyData] = useState(initialDailyData);
 
-  // === CONNECT WEBSOCKET ===
-    useEffect(() => {
-      websocketService.connect()
-      return () => websocketService.disconnect();
-    }, []);
 
   // Real-time data update simulation every 4 seconds
   useEffect(() => {

@@ -46,12 +46,6 @@ export default function RoomControl() {
   //   }));
   // };
 
-  // === CONNECT WEBSOCKET ===
-  useEffect(() => {
-    websocketService.connect()
-    return () => websocketService.disconnect();
-  }, []);
-
   // === 🔌 SEND TO BACKEND ===
   const sendToBackend = (roomId: number, target: "lamp" | "ac", value: "on" | "off") => {
     const device = deviceMap[roomId];
