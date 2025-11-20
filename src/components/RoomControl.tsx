@@ -109,7 +109,7 @@ export default function RoomControl() {
 
                 history: {
                   power: matched.history?.power ?? room.history.power,
-                  temp: matched.history?.temp ?? room.history.temp
+                  temp: matched.history?.temperature ?? room.history.temp
                 }
                 
               }
