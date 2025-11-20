@@ -109,6 +109,7 @@ export default function Dashboard() {
 
     // Subscribe ke data power_summary (sesuai format dari backend)
     const unsubscribe =  websocketService.subscribe(TOPICS.POWER, (payload) => {
+      if (!payload || payload.power === null) return;
       // Kalau backend kirim format {"type": "power_summary", "payload": {...}}
       setTotalPower(payload.total_today_kwh ?? 0);
       setTodayCost(payload.total_today_cost ?? 0);
@@ -118,12 +119,14 @@ export default function Dashboard() {
 
     // subscribe ke topic alarms
     const unsubscribeAlarms = websocketService.subscribe(TOPICS.ALARMS, (payload) => {
+      if (!payload || payload.active_alarms === null) return;
       setActiveAlarms(payload.active_alarms ?? 0);
       setHighPriorityAlarms(payload.high_priority_alarms ?? 0);
     });
 
     // subscribe ke topic solar data
     const unsubscribeSolarData = websocketService.subscribe(TOPICS.SOLAR, (payload) => {
+      if (!payload || payload.solar_today_kwh === null) return;
       setSolarOutput(payload.solar_today_kwh ?? 0);
       setSolarsolarOutputOfTotal(payload.solar_share_pct ?? 0);
     });
