@@ -104,11 +104,11 @@ export default function RoomControl() {
                 voltage: matched.voltage,
                 ampere: matched.ampere,
                 temperature: matched.temperature,
-                kwh: matched.kwh,
+                kwh: matched.kwh, 
 
                 history: {
-                  kwh: matched.history?.kwh ?? room.history.kwh,
-                  temperature: matched.history?.temperature ?? room.history.temperature
+                  kwh: matched.history?.kwh.value ?? room.history.kwh,
+                  temperature: matched.history?.temperature.value ?? room.history.temperature
                 }
                 
               }
