@@ -92,31 +92,37 @@ export default function RoomControl() {
     const unsubscribe = websocketService.subscribe(TOPICS.ROOM_STATUS, (roomsPayload) => {
 
       if (!Array.isArray(roomsPayload)) return;
-      console.log("Received room status update:", roomsPayload);
 
       setRoomsState(prevRooms =>
         prevRooms.map(room => {
           const matched = roomsPayload.find(r => r.device === deviceMap[room.id]);
 
-          return matched
-            ? {
-                ...room,
-                name: matched.room_name || room.name,
-                lights: matched.lights,
-                ac: matched.ac,
-                voltage: matched.voltage,
-                ampere: matched.ampere,
-                temperature: matched.temperature,
-                kwh: matched.kwh,
-                power: matched.power,
+          if (matched) {
 
-                // langsung assign history karena format sudah sesuai
-                history: Array.isArray(matched.history) && matched.history.length > 0
-                ? matched.history
-                : room.history
+            // Update selected room in real-time
+            if (selectedRoom && matched.device === deviceMap[selectedRoom.id]) {
+              setSelectedRoom(prev => ({
+                ...prev!,
+                ...matched,
+                history: Array.isArray(matched.history) ? matched.history : prev!.history
+              }));
+            }
 
-              }
-            : room;
+            return {
+              ...room,
+              name: matched.room_name || room.name,
+              lights: matched.lights,
+              ac: matched.ac,
+              voltage: matched.voltage,
+              ampere: matched.ampere,
+              temperature: matched.temperature,
+              kwh: matched.kwh,
+              power: matched.power,
+              history: Array.isArray(matched.history) ? matched.history : room.history
+            };
+          }
+
+          return room;
         })
       );
     });
