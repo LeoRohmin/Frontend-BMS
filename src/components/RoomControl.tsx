@@ -111,12 +111,10 @@ export default function RoomControl() {
                 power: matched.power,
 
                 // langsung assign history karena format sudah sesuai
-                history: {
-                  ...room.history,
-                  data: Array.isArray(matched.history) && matched.history.length > 0
-                    ? matched.history
-                    : room.history
-                }
+                history: Array.isArray(matched.history) && matched.history.length > 0
+                ? matched.history
+                : room.history
+
               }
             : room;
         })
@@ -307,8 +305,8 @@ export default function RoomControl() {
                     <XAxis dataKey="time" />
                     <YAxis />
                     <Tooltip />
-                    <Line type="monotone" dataKey="power" stroke="#8884d8" activeDot={{ r: 8 }} />
-                    <Line type="monotone" dataKey="temp" stroke="#82ca9d" />
+                    <Line type="monotone" dataKey="kwh" stroke="#8884d8" activeDot={{ r: 8 }} />
+                    <Line type="monotone" dataKey="temperature" stroke="#82ca9d" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
