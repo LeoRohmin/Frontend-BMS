@@ -125,7 +125,7 @@ export default function RoomControl() {
             temperature: matched.temperature,
             kwh: matched.kwh,
             power: matched.power,
-            history: Array.isArray(matched.history) ? matched.history : room.history
+            history: Array.isArray(matched.history) ? matched.history : room.history,
           };
         })
       );
@@ -311,7 +311,32 @@ export default function RoomControl() {
               <div className="border-t border-border pt-3">
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart
-                    data={selectedRoom?.history ?? []}
+                    data={selectedRoom?.history ?? [
+                      { time: '00:00', kwh: 0, temperature: 0 },
+                      { time: '01:00', kwh: 0, temperature: 0 },
+                      { time: '02:00', kwh: 0, temperature: 0 },
+                      { time: '03:00', kwh: 0, temperature: 0 },
+                      { time: '04:00', kwh: 0, temperature: 0 },
+                      { time: '05:00', kwh: 0, temperature: 0 },
+                      { time: '06:00', kwh: 0, temperature: 0 },
+                      { time: '07:00', kwh: 0, temperature: 0 },
+                      { time: '08:00', kwh: 0, temperature: 0 },
+                      { time: '09:00', kwh: 0, temperature: 0 },
+                      { time: '10:00', kwh: 0, temperature: 0 },
+                      { time: '11:00', kwh: 0, temperature: 0 },
+                      { time: '12:00', kwh: 0, temperature: 0 },
+                      { time: '13:00', kwh: 0, temperature: 0 },
+                      { time: '14:00', kwh: 0, temperature: 0 },
+                      { time: '15:00', kwh: 0, temperature: 0 },
+                      { time: '16:00', kwh: 0, temperature: 0 },
+                      { time: '17:00', kwh: 0, temperature: 0 },
+                      { time: '18:00', kwh: 0, temperature: 0 },
+                      { time: '19:00', kwh: 0, temperature: 0 },
+                      { time: '20:00', kwh: 0, temperature: 0 },
+                      { time: '21:00', kwh: 0, temperature: 0 },
+                      { time: '22:00', kwh: 0, temperature: 0 },
+                      { time: '23:00', kwh: 0, temperature: 0 } 
+                    ]}
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
