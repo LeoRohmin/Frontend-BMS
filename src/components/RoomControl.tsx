@@ -137,7 +137,14 @@ export default function RoomControl() {
       unsubscribe();
       unsubscribeTes();
     };
-  }, [selectedRoom]);
+  }, []);
+
+  useEffect(() => {
+  if (selectedRoom) {
+    const updated = roomsState.find(r => r.id === selectedRoom.id);
+    if (updated) setSelectedRoom(updated);
+  }
+}, [roomsState]);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
@@ -300,7 +307,7 @@ export default function RoomControl() {
               <div className="border-t border-border pt-3">
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart
-                    data={selectedRoom.history.length > 0 ? selectedRoom.history : Array.from({ length: 24 }, (_, i) => ({
+                    data={selectedRoom.history?.length > 0 ? selectedRoom.history : Array.from({ length: 24 }, (_, i) => ({
                       time: `${i.toString().padStart(2, '0')}:00`,
                       kwh: 0,
                       temperature: 0,
