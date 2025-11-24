@@ -85,6 +85,8 @@ export default function RoomControl() {
     }
   };
 
+  
+
   // === Subscribe to real-time updates from backend ===
   useEffect(() => {
     const unsubscribe = websocketService.subscribe(TOPICS.ROOM_STATUS, (roomsPayload) => {
@@ -117,7 +119,15 @@ export default function RoomControl() {
       );
     });
 
-    return () => unsubscribe();
+      // Tes Data
+    const unsubscribeTes = websocketService.subscribe(TOPICS.TES, (payload) => {
+        console.log("Received TES data:", payload);
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeTes();
+    };
   }, []);
 
   return (
