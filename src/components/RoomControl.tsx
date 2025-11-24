@@ -22,14 +22,14 @@ const deviceMap: Record<number, string> = {
 };
 
 const rooms = [
-  { id: 1, name: 'Lobby', lights: true, ac: true, power: 24.5, voltage: 220, ampere: 15.2, temperature: 24, kwh: 24.5, history: {kwh: [], temperature: []} },
-  { id: 2, name: 'Office Area', lights: true, ac: true, power: 45.2, voltage: 220, ampere: 28.5, temperature: 22, kwh: 45.2, history: {kwh: [], temperature: []} },
-  { id: 3, name: 'Meeting Room A', lights: false, ac: false, power: 0, voltage: 220, ampere: 0, temperature: 26, kwh: 18.3, history: {kwh: [], temperature: []} },
-  { id: 4, name: 'Meeting Room B', lights: true, ac: true, power: 18.3, voltage: 220, ampere: 12.1, temperature: 23, kwh: 18.3, history: {kwh: [], temperature: []} },
-  { id: 5, name: 'Server Room', lights: true, ac: true, power: 62.8, voltage: 220, ampere: 42.5, temperature: 19, kwh: 62.8, history: {kwh: [], temperature: []} },
-  { id: 6, name: 'Cafeteria', lights: true, ac: true, power: 28.6, voltage: 220, ampere: 18.9, temperature: 25, kwh: 28.6, history: {kwh: [], temperature: []} },
-  { id: 7, name: 'Storage', lights: false, ac: false, power: 0, voltage: 220, ampere: 0, temperature: 28, kwh: 5.2, history: {kwh: [], temperature: []} },
-  { id: 8, name: 'Parking', lights: true, ac: false, power: 8.4, voltage: 220, ampere: 5.6, temperature: 30, kwh: 8.4, history: {kwh: [], temperature: []} },
+  { id: 1, name: 'Lobby', lights: true, ac: true, power: 24.5, voltage: 220, ampere: 15.2, temperature: 24, kwh: 24.5, history: [] },
+  { id: 2, name: 'Office Area', lights: true, ac: true, power: 45.2, voltage: 220, ampere: 28.5, temperature: 22, kwh: 45.2, history: [] },
+  { id: 3, name: 'Meeting Room A', lights: false, ac: false, power: 0, voltage: 220, ampere: 0, temperature: 26, kwh: 18.3, history: [] },
+  { id: 4, name: 'Meeting Room B', lights: true, ac: true, power: 18.3, voltage: 220, ampere: 12.1, temperature: 23, kwh: 18.3, history: [] },
+  { id: 5, name: 'Server Room', lights: true, ac: true, power: 62.8, voltage: 220, ampere: 42.5, temperature: 19, kwh: 62.8, history: [] },
+  { id: 6, name: 'Cafeteria', lights: true, ac: true, power: 28.6, voltage: 220, ampere: 18.9, temperature: 25, kwh: 28.6, history: [] },
+  { id: 7, name: 'Storage', lights: false, ac: false, power: 0, voltage: 220, ampere: 0, temperature: 28, kwh: 5.2, history: [] },
+  { id: 8, name: 'Parking', lights: true, ac: false, power: 8.4, voltage: 220, ampere: 5.6, temperature: 30, kwh: 8.4, history: [] },
 ];
 
 export default function RoomControl() {
@@ -96,28 +96,33 @@ export default function RoomControl() {
 
       setRoomsState(prevRooms =>
         prevRooms.map(room => {
-          const matched = roomsPayload.find(
-            r => r.device === deviceMap[room.id]
-          );
+          const matched = roomsPayload.find(r => r.device === deviceMap[room.id]);
 
           return matched
             ? {
                 ...room,
+                name: matched.room_name || room.name,
+                lights: matched.lights,
+                ac: matched.ac,
                 voltage: matched.voltage,
                 ampere: matched.ampere,
                 temperature: matched.temperature,
-                kwh: matched.kwh, 
+                kwh: matched.kwh,
+                power: matched.power,
 
+                // langsung assign history karena format sudah sesuai
                 history: {
-                  kwh: matched.history?.kwh.value ?? room.history.kwh,
-                  temperature: matched.history?.temperature.value ?? room.history.temperature
+                  ...room.history,
+                  data: Array.isArray(matched.history) && matched.history.length > 0
+                    ? matched.history
+                    : room.history
                 }
-                
               }
             : room;
         })
       );
     });
+
 
       // Tes Data
     const unsubscribeTes = websocketService.subscribe(TOPICS.TES, (payload) => {
@@ -291,7 +296,7 @@ export default function RoomControl() {
               <div className="border-t border-border pt-3">
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart
-                    data={selectedRoom.history.kwh.length > 0 ? selectedRoom.history.kwh : Array.from({ length: 24 }, (_, i) => ({
+                    data={selectedRoom.history.length > 0 ? selectedRoom.history : Array.from({ length: 24 }, (_, i) => ({
                       time: `${i.toString().padStart(2, '0')}:00`,
                       kwh: 0,
                       temperature: 0,
