@@ -99,13 +99,23 @@ export default function RoomControl() {
 
           if (matched) {
 
-            // Update selected room in real-time
             if (selectedRoom && matched.device === deviceMap[selectedRoom.id]) {
-              setSelectedRoom(prev => ({
-                ...prev!,
-                ...matched,
-                history: Array.isArray(matched.history) ? matched.history : prev!.history
-              }));
+              const updatedHistory = Array.isArray(matched.history)
+                ? matched.history.map((item: any) => ({
+                    time: item.time || item.timestamp?.slice(11, 16) || "--",
+                    kwh: item.kwh ?? item.value ?? 0,
+                    temperature: item.temperature ?? item.temp ?? 0
+                  }))
+                : selectedRoom.history;
+
+              // Only update selectedRoom if the history actually changed
+              if (JSON.stringify(updatedHistory) !== JSON.stringify(selectedRoom.history)) {
+                setSelectedRoom(prev => ({
+                  ...prev!,
+                  ...matched,
+                  history: updatedHistory,
+                }));
+              }
             }
 
             return {
