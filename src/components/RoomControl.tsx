@@ -120,7 +120,7 @@ export default function RoomControl() {
               power: matched.power,
               history: Array.isArray(matched.history)
                       ? matched.history.map((item: any) => ({
-                          time: item.time || "--",
+                          time: item.time || item.timestamp?.slice(11, 16) || "--",
                           kwh: item.kwh ?? item.value ?? 0,
                           temperature: item.temperature ?? item.temp ?? 0
                         }))
