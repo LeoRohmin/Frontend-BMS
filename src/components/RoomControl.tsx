@@ -91,6 +91,7 @@ export default function RoomControl() {
   useEffect(() => {
     const unsubscribe = websocketService.subscribe(TOPICS.ROOM_STATUS, (roomsPayload) => {
       if (!Array.isArray(roomsPayload)) return;
+      console.log("Received room status update:", roomsPayload);
 
       setRoomsState(prevRooms =>
         prevRooms.map(room => {
