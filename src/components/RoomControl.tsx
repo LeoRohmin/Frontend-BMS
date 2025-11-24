@@ -118,7 +118,14 @@ export default function RoomControl() {
               temperature: matched.temperature,
               kwh: matched.kwh,
               power: matched.power,
-              history: Array.isArray(matched.history) ? matched.history : room.history
+              history: Array.isArray(matched.history)
+                      ? matched.history.map((item: any) => ({
+                          time: item.time || "--",
+                          kwh: item.kwh ?? item.value ?? 0,
+                          temperature: item.temperature ?? item.temp ?? 0
+                        }))
+                      : room.history
+
             };
           }
 
