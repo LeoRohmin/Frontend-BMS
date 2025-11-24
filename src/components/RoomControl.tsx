@@ -22,14 +22,14 @@ const deviceMap: Record<number, string> = {
 };
 
 const rooms = [
-  { id: 1, name: 'Lobby', lights: true, ac: true, power: 24.5, voltage: 220, ampere: 15.2, temp: 24, kwh: 24.5, history: {power: [], temp: []} },
-  { id: 2, name: 'Office Area', lights: true, ac: true, power: 45.2, voltage: 220, ampere: 28.5, temp: 22, kwh: 45.2, history: {power: [], temp: []} },
-  { id: 3, name: 'Meeting Room A', lights: false, ac: false, power: 0, voltage: 220, ampere: 0, temp: 26, kwh: 18.3, history: {power: [], temp: []} },
-  { id: 4, name: 'Meeting Room B', lights: true, ac: true, power: 18.3, voltage: 220, ampere: 12.1, temp: 23, kwh: 18.3, history: {power: [], temp: []} },
-  { id: 5, name: 'Server Room', lights: true, ac: true, power: 62.8, voltage: 220, ampere: 42.5, temp: 19, kwh: 62.8, history: {power: [], temp: []} },
-  { id: 6, name: 'Cafeteria', lights: true, ac: true, power: 28.6, voltage: 220, ampere: 18.9, temp: 25, kwh: 28.6, history: {power: [], temp: []} },
-  { id: 7, name: 'Storage', lights: false, ac: false, power: 0, voltage: 220, ampere: 0, temp: 28, kwh: 5.2, history: {power: [], temp: []} },
-  { id: 8, name: 'Parking', lights: true, ac: false, power: 8.4, voltage: 220, ampere: 5.6, temp: 30, kwh: 8.4, history: {power: [], temp: []} },
+  { id: 1, name: 'Lobby', lights: true, ac: true, power: 24.5, voltage: 220, ampere: 15.2, temperature: 24, kwh: 24.5, history: {kwh: [], temperature: []} },
+  { id: 2, name: 'Office Area', lights: true, ac: true, power: 45.2, voltage: 220, ampere: 28.5, temperature: 22, kwh: 45.2, history: {kwh: [], temperature: []} },
+  { id: 3, name: 'Meeting Room A', lights: false, ac: false, power: 0, voltage: 220, ampere: 0, temperature: 26, kwh: 18.3, history: {kwh: [], temperature: []} },
+  { id: 4, name: 'Meeting Room B', lights: true, ac: true, power: 18.3, voltage: 220, ampere: 12.1, temperature: 23, kwh: 18.3, history: {kwh: [], temperature: []} },
+  { id: 5, name: 'Server Room', lights: true, ac: true, power: 62.8, voltage: 220, ampere: 42.5, temperature: 19, kwh: 62.8, history: {kwh: [], temperature: []} },
+  { id: 6, name: 'Cafeteria', lights: true, ac: true, power: 28.6, voltage: 220, ampere: 18.9, temperature: 25, kwh: 28.6, history: {kwh: [], temperature: []} },
+  { id: 7, name: 'Storage', lights: false, ac: false, power: 0, voltage: 220, ampere: 0, temperature: 28, kwh: 5.2, history: {kwh: [], temperature: []} },
+  { id: 8, name: 'Parking', lights: true, ac: false, power: 8.4, voltage: 220, ampere: 5.6, temperature: 30, kwh: 8.4, history: {kwh: [], temperature: []} },
 ];
 
 export default function RoomControl() {
@@ -101,15 +101,14 @@ export default function RoomControl() {
           return matched
             ? {
                 ...room,
-                power: matched.power,
                 voltage: matched.voltage,
                 ampere: matched.ampere,
-                temp: matched.temp,
+                temperature: matched.temperature,
                 kwh: matched.kwh,
 
                 history: {
-                  power: matched.history?.power ?? room.history.power,
-                  temp: matched.history?.temperature ?? room.history.temp
+                  kwh: matched.history?.kwh ?? room.history.kwh,
+                  temperature: matched.history?.temperature ?? room.history.temperature
                 }
                 
               }
@@ -204,7 +203,7 @@ export default function RoomControl() {
                       <span className="text-xs text-muted-foreground">Temp</span>
                       <p className="font-medium flex items-center gap-1">
                         <Thermometer className="h-3 w-3 text-primary" />
-                        {room.temp}°C
+                        {room.temperature}°C
                       </p>
                     </div>
                     <div>
@@ -270,7 +269,7 @@ export default function RoomControl() {
                     <span className="text-xs text-muted-foreground">Temp</span>
                     <p className="font-medium flex items-center gap-1">
                       <Thermometer className="h-3 w-3 text-primary" />
-                      {selectedRoom.temp}°C
+                      {selectedRoom.temperature}°C
                     </p>
                   </div>
                   <div>
@@ -282,10 +281,10 @@ export default function RoomControl() {
               <div className="border-t border-border pt-3">
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart
-                    data={selectedRoom.history.power.length > 0 ? selectedRoom.history.power : Array.from({ length: 24 }, (_, i) => ({
+                    data={selectedRoom.history.kwh.length > 0 ? selectedRoom.history.kwh : Array.from({ length: 24 }, (_, i) => ({
                       time: `${i.toString().padStart(2, '0')}:00`,
-                      power: 0,
-                      temp: 0,
+                      kwh: 0,
+                      temperature: 0,
                     }))}
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                   >

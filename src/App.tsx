@@ -17,7 +17,7 @@ import AlarmPage from './components/AlarmPage';
 import SettingsPage from './components/SettingsPage';
 import NotificationsPage from './components/NotificationsPage';
 import { Button } from './components/ui/button';
-import logoImage from 'figma:asset/5c52e23f7f375ac1e0785bc4a409701a70a18d7f.png';
+import logoImage from 'figma:static/asset/5c52e23f7f375ac1e0785bc4a409701a70a18d7f.png';
 import { websocketService, TOPICS } from './services/websocketService';
 
 type PLCStatus = 'online' | 'offline' | 'connecting';
