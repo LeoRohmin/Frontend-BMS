@@ -90,56 +90,42 @@ export default function RoomControl() {
   // === Subscribe to real-time updates from backend ===
   useEffect(() => {
     const unsubscribe = websocketService.subscribe(TOPICS.ROOM_STATUS, (roomsPayload) => {
-
       if (!Array.isArray(roomsPayload)) return;
 
       setRoomsState(prevRooms =>
         prevRooms.map(room => {
           const matched = roomsPayload.find(r => r.device === deviceMap[room.id]);
 
-          if (matched) {
+          if (!matched) return room;
 
-            // if (selectedRoom && matched.device === deviceMap[selectedRoom.id]) {
-            //   const updatedHistory = Array.isArray(matched.history)
-            //     ? matched.history.map((item: any) => ({
-            //         time: item.time || item.timestamp?.slice(11, 16) || "--",
-            //         kwh: item.kwh ?? item.value ?? 0,
-            //         temperature: item.temperature ?? item.temp ?? 0
-            //       }))
-            //     : selectedRoom.history;
+          // --- Update selected room jika popup aktif & device sama ---
+          if (selectedRoom && matched.device === deviceMap[selectedRoom.id]) {
 
-            //   // Only update selectedRoom if the history actually changed
-            //   if (JSON.stringify(updatedHistory) !== JSON.stringify(selectedRoom.history)) {
-            //     setSelectedRoom(prev => ({
-            //       ...prev!,
-            //       ...matched,
-            //       history: updatedHistory,
-            //     }));
-            //   }
-            // }
+            const newHistory = Array.isArray(matched.history) ? matched.history : [];
 
-            return {
-              ...room,
-              name: matched.room_name || room.name,
-              lights: matched.lights,
-              ac: matched.ac,
-              voltage: matched.voltage,
-              ampere: matched.ampere,
-              temperature: matched.temperature,
-              kwh: matched.kwh,
-              power: matched.power,
-              history: Array.isArray(matched.history)
-                      ? matched.history.map((item: any) => ({
-                          time: item.time || item.timestamp?.slice(11, 16) || "--",
-                          kwh: item.kwh ?? item.value ?? 0,
-                          temperature: item.temperature ?? item.temp ?? 0
-                        }))
-                      : room.history
-
-            };
+            // update kalau jumlah history berubah (lebih efisien dari JSON.stringify)
+            if (newHistory.length !== selectedRoom.history.length) {
+              setSelectedRoom(prev => ({
+                ...prev!,
+                ...matched,
+                history: newHistory
+              }));
+            }
           }
 
-          return room;
+          // --- Update room state umum ---
+          return {
+            ...room,
+            name: matched.room_name ?? room.name,
+            lights: matched.lights,
+            ac: matched.ac,
+            voltage: matched.voltage,
+            ampere: matched.ampere,
+            temperature: matched.temperature,
+            kwh: matched.kwh,
+            power: matched.power,
+            history: Array.isArray(matched.history) ? matched.history : room.history
+          };
         })
       );
     });
@@ -324,11 +310,7 @@ export default function RoomControl() {
               <div className="border-t border-border pt-3">
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart
-                    data={selectedRoom.history.length > 0 ? selectedRoom.history : Array.from({ length: 24 }, (_, i) => ({
-                      time: `${i.toString().padStart(2, '0')}:00`,
-                      kwh: 0,
-                      temperature: 0,
-                    }))}
+                    data={selectedRoom?.history ?? []}
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
