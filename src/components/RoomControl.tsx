@@ -307,11 +307,7 @@ export default function RoomControl() {
               <div className="border-t border-border pt-3">
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart
-                    data={selectedRoom.history?.length > 0 ? selectedRoom.history : Array.from({ length: 24 }, (_, i) => ({
-                      time: `${i.toString().padStart(2, '0')}:00`,
-                      kwh: 0,
-                      temperature: 0,
-                    }))}
+                    data={selectedRoom.history ?? []}
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
