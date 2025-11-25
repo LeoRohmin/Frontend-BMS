@@ -46,6 +46,35 @@ export default function RoomControl() {
   //   }));
   // };
 
+
+    useEffect(() => {
+    // Cek apakah WebSocket sudah connect
+    if (websocketService.isConnected()) {
+      sendInitialRequest();
+    } else {
+      // Kalau belum connect, tunggu connect selesai
+      const interval = setInterval(() => {
+        if (websocketService.isConnected()) {
+          sendInitialRequest();
+          clearInterval(interval);
+        }
+      }, 100); // cek tiap 100ms
+    }
+
+    function sendInitialRequest() {
+      const message = {
+        type: "request_data",
+        topic: TOPICS.REQUEST_DATA,
+        payload: { request: "initial_RoomControl_data" },
+        timestamp: Date.now(),
+      };
+
+      websocketService.send(message);
+      console.log("✅ Request data sent for this page:", message);
+    }
+
+  }, []);
+
   // === 🔌 SEND TO BACKEND ===
   const sendToBackend = (roomId: number, target: "lamp" | "ac", value: "on" | "off") => {
     const device = deviceMap[roomId];

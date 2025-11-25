@@ -124,7 +124,7 @@ export default function Dashboard() {
       const message = {
         type: "request_data",
         topic: TOPICS.REQUEST_DATA,
-        payload: { request: "initial_dashboard_data" },
+        payload: { request: "initial_Dashboard_data" },
         timestamp: Date.now(),
       };
 
