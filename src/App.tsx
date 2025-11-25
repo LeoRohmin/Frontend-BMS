@@ -34,25 +34,35 @@ export default function App() {
     localStorage.setItem("lastView", activeView);
   }, [activeView]);
 
-  // Restore last active page on refresh
+
   useEffect(() => {
+    const savedUser = localStorage.getItem("authUser");
     const savedView = localStorage.getItem("lastView");
-    if (savedView) {
-      setActiveView(savedView);
-    }
-  }, []);
 
-
-  // restore login on refresh
-  useEffect(() => {
-    const saved = localStorage.getItem("authUser");
-
-    if (saved) {
-      const user = JSON.parse(saved);
+    if (savedUser) {
       setIsLoggedIn(true);
-      setCurrentUser(user);
+
+      // restore halaman terakhir
+      if (savedView) {
+        setActiveView(savedView);
+      }
+    } else {
+      // jika belum login, selalu buka login page
+      setActiveView("login");
     }
   }, []);
+
+
+  // // restore login on refresh
+  // useEffect(() => {
+  //   const saved = localStorage.getItem("authUser");
+
+  //   if (saved) {
+  //     const user = JSON.parse(saved);
+  //     setIsLoggedIn(true);
+  //     setCurrentUser(user);
+  //   }
+  // }, []);
 
   const handleLogin = (username: string, role: string) => {
     setIsLoggedIn(true);
