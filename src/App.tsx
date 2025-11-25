@@ -70,6 +70,9 @@ export default function App() {
     setIsLoggedIn(true);
     setCurrentUser({ username, role });
     localStorage.setItem("authUser", JSON.stringify({ username, role }));
+
+    // 🔥 RECONNECT WEBSOCKET SETELAH LOGIN
+    websocketService.connect();
   };
 
   // === CONNECT WEBSOCKET ===
