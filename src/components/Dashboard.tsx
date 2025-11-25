@@ -109,16 +109,20 @@ export default function Dashboard() {
 
   useEffect(() => {
 
-    // Pastikan websocket sudah connect
-    if (websocketService.isConnected()) {
-      websocketService.send({
-        type: "request_data",
-        topic: TOPICS.REQUEST_DATA,
-        payload: { request: "initial_dashboard_data" },
-        timestamp: Date.now(),
-      });
-      console.log("Request initial dashboard data sent");
-    }
+    const sendRequestData = () => {
+      if (websocketService.isConnected()) {
+        websocketService.send({
+          type: "request_data",
+          topic: TOPICS.REQUEST_DATA,
+          payload: { request: "initial_dashboard_data" },
+          timestamp: Date.now(),
+        });
+        console.log("✅ Request data sent to backend");
+      } else {
+        console.warn("❌ WebSocket not connected yet. Cannot send request data.");
+      }
+    };
+
 
     // Subscribe ke data power_summary (sesuai format dari backend)
     const unsubscribe =  websocketService.subscribe(TOPICS.POWER, (payload) => {
@@ -207,7 +211,7 @@ export default function Dashboard() {
       unsubscribeRealtime();
       unsubscribeOverview();
       unsubscribeTes();
-      unsubscribeInitial();
+      sendRequestData();
     };
   }, []);
 
