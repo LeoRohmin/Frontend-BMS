@@ -107,6 +107,12 @@ export default function Dashboard() {
 
   useEffect(() => {
 
+    console.log("Request initial dashboard data sent:", {
+      type: "request_data",
+      topic: TOPICS.REQUEST_DATA,
+      payload: { request: "initial_dashboard_data" },
+      timestamp: Date.now(),
+    });
     // Request initial data once connected
     websocketService.send({
       type: "request_data",
@@ -114,11 +120,8 @@ export default function Dashboard() {
       payload: { request: "initial_dashboard_data" },
       timestamp: Date.now(),
     })
+    
 
-    // Subscribe ke response dari backend
-    const unsubscribeInitial = websocketService.subscribe(TOPICS.REQUEST_DATA, (payload) => {
-      console.log("Initial dashboard data received:", payload);
-    });
 
     // Subscribe ke data power_summary (sesuai format dari backend)
     const unsubscribe =  websocketService.subscribe(TOPICS.POWER, (payload) => {
