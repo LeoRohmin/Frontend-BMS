@@ -42,6 +42,24 @@ export default function App() {
     }
   }, []);
 
+
+  // restore login on refresh
+  useEffect(() => {
+    const saved = localStorage.getItem("authUser");
+
+    if (saved) {
+      const user = JSON.parse(saved);
+      setIsLoggedIn(true);
+      setCurrentUser(user);
+    }
+  }, []);
+
+  const handleLogin = (username: string, role: string) => {
+    setIsLoggedIn(true);
+    setCurrentUser({ username, role });
+    localStorage.setItem("authUser", JSON.stringify({ username, role }));
+  };
+
   // === CONNECT WEBSOCKET ===
     useEffect(() => {
       websocketService.connect()
@@ -66,23 +84,6 @@ export default function App() {
     };
   }, []);
 
-  // restore login on refresh
-  useEffect(() => {
-    const saved = localStorage.getItem("authUser");
-
-    if (saved) {
-      const user = JSON.parse(saved);
-      setIsLoggedIn(true);
-      setCurrentUser(user);
-    }
-  }, []);
-
-  const handleLogin = (username: string, role: string) => {
-    setIsLoggedIn(true);
-    setCurrentUser({ username, role });
-    localStorage.setItem("authUser", JSON.stringify({ username, role }));
-  };
-
 
   const handleLogout = () => {
     websocketService.disconnect();
@@ -91,6 +92,7 @@ export default function App() {
     setActiveView('dashboard');
     toast.success('Logged out successfully');
     localStorage.removeItem("authUser");
+    localStorage.removeItem("lastView");
   };
 
   // Show login page if not logged in
