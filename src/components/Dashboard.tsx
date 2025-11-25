@@ -105,23 +105,20 @@ export default function Dashboard() {
   const [highPriorityAlarms, setHighPriorityAlarms] = useState(2);
   const [floors, setFloors] = useState(FloorsStatus);
 
+
+
   useEffect(() => {
 
-    console.log("Request initial dashboard data sent:", {
-      type: "request_data",
-      topic: TOPICS.REQUEST_DATA,
-      payload: { request: "initial_dashboard_data" },
-      timestamp: Date.now(),
-    });
-    // Request initial data once connected
-    websocketService.send({
-      type: "request_data",
-      topic: TOPICS.REQUEST_DATA,
-      payload: { request: "initial_dashboard_data" },
-      timestamp: Date.now(),
-    })
-    
-
+    // Pastikan websocket sudah connect
+    if (websocketService.isConnected()) {
+      websocketService.send({
+        type: "request_data",
+        topic: TOPICS.REQUEST_DATA,
+        payload: { request: "initial_dashboard_data" },
+        timestamp: Date.now(),
+      });
+      console.log("Request initial dashboard data sent");
+    }
 
     // Subscribe ke data power_summary (sesuai format dari backend)
     const unsubscribe =  websocketService.subscribe(TOPICS.POWER, (payload) => {
