@@ -121,16 +121,19 @@ export default function Dashboard() {
     }
 
     function sendInitialRequest() {
-      websocketService.send({
+      const message = {
         type: "request_data",
         topic: TOPICS.REQUEST_DATA,
         payload: { request: "initial_dashboard_data" },
         timestamp: Date.now(),
-      });
-      console.log("✅ Request data sent for this page");
+      };
+
+      websocketService.send(message);
+      console.log("✅ Request data sent for this page:", message);
     }
 
   }, []);
+
 
 
   useEffect(() => {
