@@ -23,7 +23,9 @@ import { websocketService, TOPICS } from './services/websocketService';
 type PLCStatus = 'online' | 'offline' | 'connecting';
 
 export default function App() {
-  const [activeView, setActiveView] = useState('dashboard');
+  const [activeView, setActiveView] = useState(() => {
+    return localStorage.getItem("lastView") || "dashboard";
+  });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({ username: '', role: '' });
   const [plcStatus, setPlcStatus] = useState<PLCStatus>('connecting');
