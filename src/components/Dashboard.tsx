@@ -115,6 +115,11 @@ export default function Dashboard() {
       timestamp: Date.now(),
     })
 
+    // Subscribe ke response dari backend
+    const unsubscribeInitial = websocketService.subscribe(TOPICS.REQUEST_DATA, (payload) => {
+      console.log("Initial dashboard data received:", payload);
+    });
+
     // Subscribe ke data power_summary (sesuai format dari backend)
     const unsubscribe =  websocketService.subscribe(TOPICS.POWER, (payload) => {
       if (!payload || payload.power === null) return;
@@ -202,6 +207,7 @@ export default function Dashboard() {
       unsubscribeRealtime();
       unsubscribeOverview();
       unsubscribeTes();
+      unsubscribeInitial();
     };
   }, []);
 
