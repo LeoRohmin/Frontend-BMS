@@ -106,23 +106,34 @@ export default function Dashboard() {
   const [floors, setFloors] = useState(FloorsStatus);
 
 
+  useEffect(() => {
+    // Cek apakah WebSocket sudah connect
+    if (websocketService.isConnected()) {
+      sendInitialRequest();
+    } else {
+      // Kalau belum connect, tunggu connect selesai
+      const interval = setInterval(() => {
+        if (websocketService.isConnected()) {
+          sendInitialRequest();
+          clearInterval(interval);
+        }
+      }, 100); // cek tiap 100ms
+    }
+
+    function sendInitialRequest() {
+      websocketService.send({
+        type: "request_data",
+        topic: TOPICS.REQUEST_DATA,
+        payload: { request: "initial_dashboard_data" },
+        timestamp: Date.now(),
+      });
+      console.log("✅ Request data sent for this page");
+    }
+
+  }, []);
+
 
   useEffect(() => {
-
-    const sendRequestData = () => {
-      if (websocketService.isConnected()) {
-        websocketService.send({
-          type: "request_data",
-          topic: TOPICS.REQUEST_DATA,
-          payload: { request: "initial_dashboard_data" },
-          timestamp: Date.now(),
-        });
-        console.log("✅ Request data sent to backend");
-      } else {
-        console.warn("❌ WebSocket not connected yet. Cannot send request data.");
-      }
-    };
-
 
     // Subscribe ke data power_summary (sesuai format dari backend)
     const unsubscribe =  websocketService.subscribe(TOPICS.POWER, (payload) => {
@@ -168,7 +179,7 @@ export default function Dashboard() {
     // === Subscribe ke chart data ===
     const unsubscribeComparisonData = websocketService.subscribe("pln_vs_solar", (data) => {
       if (data?.pln && data?.solar) {
-        console.log("Received PLN vs Solar data:", data);
+        //console.log("Received PLN vs Solar data:", data);
         const formattedData = data.pln.map((plnItem: any, i: number) => ({
           name: new Date(plnItem.date).toLocaleDateString("en-US", {
             weekday: "short",
@@ -211,7 +222,7 @@ export default function Dashboard() {
       unsubscribeRealtime();
       unsubscribeOverview();
       unsubscribeTes();
-      sendRequestData();
+  
     };
   }, []);
 
