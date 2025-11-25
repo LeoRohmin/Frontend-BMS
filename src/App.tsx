@@ -29,6 +29,19 @@ export default function App() {
   const [plcStatus, setPlcStatus] = useState<PLCStatus>('connecting');
   const [notificationCount, setNotificationCount] = useState(3);
 
+  // Save view to storage every time user changes page
+  useEffect(() => {
+    localStorage.setItem("lastView", activeView);
+  }, [activeView]);
+
+  // Restore last active page on refresh
+  useEffect(() => {
+    const savedView = localStorage.getItem("lastView");
+    if (savedView) {
+      setActiveView(savedView);
+    }
+  }, []);
+
   // === CONNECT WEBSOCKET ===
     useEffect(() => {
       websocketService.connect()

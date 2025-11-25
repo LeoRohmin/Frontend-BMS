@@ -107,6 +107,14 @@ export default function Dashboard() {
 
   useEffect(() => {
 
+    // Request initial data once connected
+    websocketService.send({
+      type: "request_data",
+      topic: TOPICS.REQUEST_DATA,
+      payload: { request: "initial_dashboard_data" },
+      timestamp: Date.now(),
+    })
+
     // Subscribe ke data power_summary (sesuai format dari backend)
     const unsubscribe =  websocketService.subscribe(TOPICS.POWER, (payload) => {
       if (!payload || payload.power === null) return;

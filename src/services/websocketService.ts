@@ -303,6 +303,8 @@ export const TOPICS = {
 
   //Controls
   CONTROL : 'control',
+
+  REQUEST_DATA : 'request_data',
   
   // All messages
   ALL: '*',
