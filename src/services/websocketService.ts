@@ -9,7 +9,7 @@
  */
 
 // TODO: Ganti dengan URL backend WebSocket Anda
-export const WEBSOCKET_URL = 'wss://edith.click//ws/dashboard/';
+export const WEBSOCKET_URL = 'wss://edith.click/ws/dashboard/';
 
 export interface WebSocketMessage {
   type: string;
